@@ -1,0 +1,6 @@
+numpy>=2.0
+matplotlib>=3.8
+
+# Optional: only needed for the pandas snippet in the README;
+# the plotting/analysis scripts use numpy + matplotlib only.
+pandas>=2.2
