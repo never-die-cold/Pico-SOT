@@ -130,6 +130,16 @@ V=5×4 µm²×15 nm）：**Jp=6e12 时 39.7 pJ**，与论文 40 pJ 口径一致�
 - **B3 Ku(T) 开关**：`KuExp=0`（Ku 不随温度变）到 Jp=1.4e13 仍**不翻转**；
   `KuExp=3` 在 1e13/1.2e13 翻转 → 热各向异性力矩为必要项，阈值能量比 ≥2
   （对应论文"能量降低 2 倍"）。
+- **C0 Heating=0 对照**（与 `b0_6e12`/`b0_8e12`/`b1_Jp10_dT300` 同参数，仅关加热）：
+  Jp=6/8/10e12 三档均**不翻转**（末态 mz≈+0.988、T 恒 300 K），峰值瞬态下拉仅
+  −8.1%/−12.4%/−17.6%（≈33 ps）→ 6–10e12 的确定性翻转完全依赖焦耳热致热各向异性
+  力矩。目录 `runs/c0_noh_*`，对照图 `runs/heating_on_off.png`。
+- **C1 相图边界中间点**（J_ref=Jp）：9e12/dT300 不翻（末态 +0.933，深度瞬态）；
+  8e12/dT375 翻 66.5 ps；7e12/dT450 翻 61.0 ps；6e12/dT600 翻 80.5 ps。
+  边界定位：Tmax≈583 K 线上 Jc∈(9,10]e12；Jp=8e12 竖线上 dTc∈(300,375]K；
+  7e12 在 Tmax=725 K 可翻，6e12 需 Tmax≳867 K（更热更慢）。三张草稿图
+  `runs/phase_map_draft.png`、`phase_traces_draft.png`、`phase_speed_draft.png`
+  （脚本 `plot_phase.py`）。
 - **Fig.4 动力学（含反射 `echo=0.3, ted=24 ps`，图 `runs/fig4_full.png`）**：
   `Hx=0` 时 ±I 曲线重合且无振荡；平行组 (Hx+,I+) 与 (Hx−,I−) 重合、
   反平行组 (Hx+,I−) 与 (Hx−,I+) 重合，两组 ΔMz 相位相反；T(t) 在 24 ps 处出现反射次级峰。
@@ -179,7 +189,7 @@ with open("resource/simulations/kimi/runs/sweep_summary.csv", "w", newline="", e
 
 ## 6. 仿真路线
 
-1. **自检**：`relax` 后 `mz ≈ cos[atan(Hx/Ha)] ≈ 0.988`；确认 `Hx=0` 不翻转、电流极性反转终态、关闭加热时 6e12 翻不动。
+1. **自检**：`relax` 后 `mz ≈ cos[atan(Hx/Ha)] ≈ 0.988`；确认 `Hx=0` 不翻转、电流极性反转终态、关闭加热时 6/8/10e12 均不翻转（`runs/c0_noh_*`）。
 2. **时域动力学（Fig.4a,b）**：`RunDynamics=1`（或 `fig4_dynamics.mx3`），
    4 种 Hx/I 组合 + ±Mz 初态，画 `ΔMz(t)`；无 Hx 时振荡消失，±电流相位差 180°。
 3. **单脉冲翻转（Fig.3/4d）**：`macrospin_switch.mx3`（或全器件 `fig3_switching.mx3`），

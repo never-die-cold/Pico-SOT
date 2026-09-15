@@ -251,6 +251,10 @@ resource\simulations\mumax3_sot\runs\
 
 - **B3 Ku(T) 开关**：`KuExp=3`（Ku∝Ms³）时 Jp=1e13 部分翻转、1.2e13 完全翻转；`KuExp=0`（Ku 不随温度变）时到 Jp=1.4e13 仍不翻转 → 热各向异性力矩是模型中的必要项；阈值能量比 ≥(1.4/1.0)²≈2，与论文"降低 2 倍"定性一致。
 
+- **C0 Heating=0 对照**：与 `b0_6e12`/`b0_8e12`/`b1_Jp10_dT300` 同参数、仅 `Heating=0`。Jp=6/8/10e12 三档均不翻转（末态 mz≈+0.988、T 恒 300 K），最大瞬态下拉 −8.1%/−12.4%/−17.6%（≈33 ps）→ 6–10e12 的确定性翻转完全依赖焦耳热致热各向异性力矩。目录 `runs/c0_noh_*`，对照图 `runs/heating_on_off.png`。
+
+- **C1 相图边界中间点**（`J_ref=Jp`）：9e12/dT300 不翻（末态 +0.933）；8e12/dT375 翻 66.5 ps；7e12/dT450 翻 61.0 ps；6e12/dT600 翻 80.5 ps → `Tmax≈583 K` 线上 `Jc∈(9,10]e12`，`Jp=8e12` 竖线上 `dTc∈(300,375]K`。草稿图 `runs/phase_map_draft.png`、`phase_traces_draft.png`、`phase_speed_draft.png`（`plot_phase.py`；B2/B3 点自动剔除，C0 无加热点保留在 T=300 K 线上）。
+
 - **F 能量核算（`energy_check.py`，ρ=81 μΩ·cm，V=5×4 µm²×15 nm）**：Jp=6e12 → **39.7 pJ**（与论文 40 pJ 口径一致）；能翻转的案例能量 70.6 pJ（8e12/450 K）、158.9 pJ（1.2e13/450 K）、441 pJ（2e13/450 K，最快 39 ps），均超出论文 <50 pJ 预算。要落回 50 pJ 内，须让模型在 ~6e12 就翻转（依赖 SI 的加热参数或更强的热各向异性协助）。
 
 ## 4. 脚本状态说明
