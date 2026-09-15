@@ -78,6 +78,9 @@ def main():
             t = c["t"] * 1e12
             t_ref = t
             dmz, kref = observable(c)
+            # the first table row (t=0) is the un-relaxed m=+z state; masking it
+            # removes the spurious +1.3% spike present in every Hx != 0 run
+            dmz[np.isclose(t, 0.0)] = np.nan
             ax[0].plot(t, dmz, color=color, ls=ls, lw=1.3,
                        label=label if i == 0 else None)
 
@@ -105,7 +108,7 @@ def main():
     h1, l1 = ax[1].get_legend_handles_labels()
     h2, l2 = axt.get_legend_handles_labels()
     ax[1].legend(h1 + h2, l1 + l2, fontsize=8, loc="upper right")
-    ax[1].annotate("echo at 24 ps", xy=(29, 19), xytext=(75, 15),
+    ax[1].annotate("echo at 29 ps (t0+ted)", xy=(29, 19), xytext=(75, 15),
                    fontsize=8, color="0.35",
                    arrowprops=dict(arrowstyle="->", color="0.35", lw=0.8))
 

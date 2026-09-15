@@ -20,7 +20,7 @@ import re
 import subprocess
 import sys
 
-MUMAX = r"E:\mumax3.12_windows_cuda12.9\mumax3.exe"
+MUMAX = os.environ.get("MUMAX3_BIN", r"E:\mumax3.12_windows_cuda12.9\mumax3.exe")
 SUMMARY = "summary.csv"
 
 
@@ -62,7 +62,8 @@ def read_table(path):
                 if abs(mz) > 1e-9:
                     recov = abs(r[idx["mz"]]) / abs(mz)
                 break
-    return t, mz, tmax, t_cross, recov
+    mz0 = rows[0][idx["mz"]]  # first table row = initial state (sign only)
+    return t, mz, tmax, t_cross, recov, mz0
 
 
 def main():
@@ -111,11 +112,11 @@ def main():
     table = os.path.join(out_dir, "table.txt")
     if not os.path.isfile(table):
         raise SystemExit("no table.txt produced")
-    t_end, mz, tmax, t_cross, recov = read_table(table)
+    t_end, mz, tmax, t_cross, recov, mz0 = read_table(table)
 
     row = {"tag": args.tag, "time": datetime.datetime.now().isoformat(timespec="seconds"),
            "t_end_ps": "%.1f" % (t_end * 1e12), "mz_final": "%.4f" % mz,
-           "switched": int(mz < 0), "Tmax_K": "%.0f" % tmax,
+           "switched": int(mz * mz0 < -0.5), "Tmax_K": "%.0f" % tmax,
            "t_cross_ps": "" if t_cross != t_cross else "%.1f" % (t_cross * 1e12),
            "recov_50ps": "" if recov != recov else "%.2f" % recov}
     row.update(sets)
