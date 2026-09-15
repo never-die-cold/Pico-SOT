@@ -45,7 +45,8 @@ LICENSE                                # MIT (code)
 LICENSE-docs                           # CC BY 4.0 (documentation)
 requirements.txt                       # Python dependencies for post-processing scripts
 docs/
-└─ RESULTS.md                          # full experiment log (verified results, English)
+├─ RESULTS.md                          # full experiment log (verified results, English)
+└─ ROADMAP.md                          # improvement plan and TODO list (Chinese)
 papers/                                # references (PDFs are not redistributed)
 ├─ README.md                           # DOI list for NE 2020 / NC 2026 / AM 2023
 └─ mumax3_docs/                        # mumax3 papers, tutorial and related refs (local only)
@@ -258,6 +259,9 @@ foreach ($Jp in "6e12","8e12","1.2e13") {
    (consistent with the paper); switching cases in this model cost 39.7–441 pJ
    (54.1 pJ @7e12/dT450; 39.7 pJ @6e12/dT600 with Tmax=867 K > Tc, close to the HAMR-like
    regime the paper excludes).
+
+Planned and deferred work (probability statistics, heating calibration, CI, release/Zenodo,
+...) is tracked in [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## 7. Known limitations
 

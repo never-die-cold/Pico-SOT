@@ -44,7 +44,8 @@ LICENSE                                # MIT（代码）
 LICENSE-docs                           # CC BY 4.0（文档）
 requirements.txt                       # 后处理脚本的 Python 依赖
 docs/
-└─ RESULTS.md                          # 完整英文实验记录（已验证结果详情）
+├─ RESULTS.md                          # 完整英文实验记录（已验证结果详情）
+└─ ROADMAP.md                          # 完善计划与待办（中文）
 papers/                                # 文献（PDF 因版权不随仓库分发）
 ├─ README.md                           # NE 2020 / NC 2026 / AM 2023 的 DOI 列表
 └─ mumax3_docs/                        # mumax3 原始论文、教程与相关文献（本地）
@@ -243,6 +244,8 @@ foreach ($Jp in "6e12","8e12","1.2e13") {
    直接对 table 里的真实 `J(t)` 积分（`rho=81 µΩ cm`、`V=5×4 µm²×15 nm`）；
    6e12/6 ps → 39.7 pJ（与论文口径一致）；本模型能翻转的案例能量 39.7–441 pJ
    （54.1 pJ @7e12/dT450；39.7 pJ @6e12/dT600，Tmax=867 K > Tc，接近论文排除的 HAMR 情形）。
+
+后续完善计划（概率统计、热模型标定、CI、发布/Zenodo 等）见 [`docs/ROADMAP.md`](docs/ROADMAP.md)。
 
 ## 7. 已知局限
 
