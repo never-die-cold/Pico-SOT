@@ -1,16 +1,17 @@
 # ---- third-party papers (not redistributed) ----
 *.pdf
 
-# ---- paper full text extraction / personal notes ----
-kimi/extracted.txt
-kimi/*.md
+# ---- paper full text extraction / translations / personal notes ----
+resource/notes/*.md
+resource/notes/extracted.txt
+!resource/notes/error.md
 
 # ---- legacy broken script and old outputs ----
-kimi/SOT_ps_switching_v1_old.mx3
-kimi/SOT_ps_switching.out/
-kimi/test_run/
+resource/simulations/kimi/SOT_ps_switching_v1_old.mx3
+resource/simulations/kimi/SOT_ps_switching.out/
+resource/simulations/kimi/test_run/
 
-# ---- mumax3 binary distribution ----
+# ---- mumax3 binary distribution (if placed at repo root) ----
 mumax3/
 
 # ---- run artifacts to ignore ----

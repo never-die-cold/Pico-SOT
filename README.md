@@ -17,28 +17,43 @@
 ## 1. 仓库结构
 
 ```
-kimi/SOT_ps_switching.mx3             # 主脚本：翻转(switch) / 时域动力学(dynamics) 两种模式
-mumax3_sot/fig4_dynamics.mx3          # Fig.4 专用动力学脚本：PBC + 电反射 echo + RK4
-kimi/runs/                            # 已验证参考运行 + 参数扫描汇总
-  sweep_summary.csv
-  2026-09-15_switch_Jp6e12_Hx160mT_Ipos/
-      run.mx3
-      out/{table.txt, log.txt, m_initial.ovf, m_final.ovf, references.bib}
-  2026-09-15_dynamics_Jp1e12_Hx160mT_Ipos/
-      ...
-mumax3_sot/fig4_dynamics.out/         # Fig.4 脚本的参考运行输出
+resource/
+├─ papers/                              # 文献 PDF（NE 2020 / NC 2026 / AM 2023）
+│  └─ mumax3_docs/                      # mumax3 原始论文、教程与相关文献
+├─ notes/                               # 论文全文/翻译/交接/踩坑记录
+│  ├─ NE_2020.md                        # 论文 markdown 版
+│  ├─ error.md                          # mumax3 复刻踩坑记录
+│  ├─ SOT_mumax3_交接文档.md            # 项目交接文档
+│  ├─ 三篇论文逐句翻译整合.md           # 论文翻译整合
+│  └─ extracted.txt                     # 论文 PDF 抽取文本
+└─ simulations/
+   ├─ kimi/                             # 宏观自旋主脚本 + 已验证参考运行
+   │  ├─ SOT_ps_switching.mx3           # 主脚本：翻转(switch) / 时域动力学(dynamics) 两种模式
+   │  └─ runs/                          # 已验证参考运行 + 参数扫描汇总
+   │     ├─ sweep_summary.csv
+   │     ├─ 2026-09-15_switch_Jp6e12_Hx160mT_Ipos/
+   │     │    run.mx3
+   │     │    out/{table.txt, log.txt, m_initial.ovf, m_final.ovf, references.bib}
+   │     └─ 2026-09-15_dynamics_Jp1e12_Hx160mT_Ipos/
+   │          ...
+   └─ mumax3_sot/                       # Fig.3/Fig.4 脚本 + 批量运行结果
+      ├─ fig4_dynamics.mx3              # Fig.4 专用动力学脚本：PBC + 电反射 echo + RK4
+      ├─ fig3_switching.mx3             # Fig.3 5×4 µm 器件单脉冲确定性翻转
+      ├─ run_case.py / plot_table.py    # 批量运行/归档 与 后处理绘图
+      ├─ fig4_dynamics.out/             # Fig.4 脚本的参考运行输出
+      └─ runs/                          # 批量结果：summary.csv + <tag>\<tag>.mx3 + out\
 ```
 
-* `kimi/SOT_ps_switching.mx3` — 宏观自旋近似（64×64、5 nm 网格），可快速验证物理与极性；
-  `RunDynamics=0` 为 6 ps 单脉冲翻转，`RunDynamics=1` 为 3.7 ps 低电流时域响应。
-* `mumax3_sot/fig4_dynamics.mx3` — 用 `SetPBC` 模拟无穷薄膜、Gaussian 脉冲、可叠加传输线反射，
-  输出 `T(t)`、`J(t)`、`Ms(t)`，适合直接对照论文 Fig. 4a/4b。
+* `resource/simulations/kimi/SOT_ps_switching.mx3` — 宏观自旋近似（64×64、5 nm 网格），
+  可快速验证物理与极性；`RunDynamics=0` 为 6 ps 单脉冲翻转，`RunDynamics=1` 为 3.7 ps 低电流时域响应。
+* `resource/simulations/mumax3_sot/fig4_dynamics.mx3` — 用 `SetPBC` 模拟无穷薄膜、Gaussian 脉冲、
+  可叠加传输线反射，输出 `T(t)`、`J(t)`、`Ms(t)`，适合直接对照论文 Fig. 4a/4b。
 
 ## 2. 快速开始
 
 ```powershell
 # 依赖：mumax3（本仓库用 3.12 + CUDA 12.9 验证）
-mumax3 -f -o runs/my_run/out kimi/SOT_ps_switching.mx3
+mumax3 -f -o runs/my_run/out resource/simulations/kimi/SOT_ps_switching.mx3
 ```
 
 参数集中在文件头的 **用户参数区**：
@@ -128,18 +143,18 @@ mumax3-convert -vtk out/m_final.ovf      # 给 ParaView
 
 ```python
 import subprocess, pathlib, re, csv
-base = pathlib.Path("kimi/SOT_ps_switching.mx3").read_text(encoding="utf-8")
+base = pathlib.Path("resource/simulations/kimi/SOT_ps_switching.mx3").read_text(encoding="utf-8")
 mx = r"E:\mumax3.12_windows_cuda12.9\mumax3.exe"
 rows = []
 for Jp in [6e12, 9e12, 1.2e13]:
-    d = pathlib.Path("kimi/runs") / f"J{Jp:.0e}_Hx160mT_Ipos"
+    d = pathlib.Path("resource/simulations/kimi/runs") / f"J{Jp:.0e}_Hx160mT_Ipos"
     d.mkdir(parents=True, exist_ok=True)
     (d / "run.mx3").write_text(base.replace("Jp      := 6e12", f"Jp      := {Jp:g}"),
                                encoding="utf-8")
     subprocess.run([mx, "-f", "-s", "-o", str(d / "out"), str(d / "run.mx3")], check=True)
     log = (d / "out" / "log.txt").read_text(encoding="utf-8", errors="ignore")
     rows.append({"Jp": Jp, "mz_final": float(re.search(r"mz after pulse = (\S+)", log).group(1))})
-with open("kimi/runs/sweep_summary.csv", "w", newline="", encoding="utf-8") as f:
+with open("resource/simulations/kimi/runs/sweep_summary.csv", "w", newline="", encoding="utf-8") as f:
     w = csv.DictWriter(f, fieldnames=["Jp", "mz_final"]); w.writeheader(); w.writerows(rows)
 ```
 
