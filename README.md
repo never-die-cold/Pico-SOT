@@ -17,33 +17,34 @@
 ## 1. 仓库结构
 
 ```
-resource/
-├─ papers/                              # 文献 PDF（NE 2020 / NC 2026 / AM 2023）
-│  └─ mumax3_docs/                      # mumax3 原始论文、教程与相关文献
-├─ notes/                               # 论文全文/翻译/交接/踩坑记录
-│  ├─ NE_2020.md                        # 论文 markdown 版
-│  ├─ error.md                          # mumax3 复刻踩坑记录
-│  ├─ SOT_mumax3_交接文档.md            # 项目交接文档
-│  ├─ 三篇论文逐句翻译整合.md           # 论文翻译整合
-│  └─ extracted.txt                     # 论文 PDF 抽取文本
-└─ simulations/
-   └─ mumax3_sot/                       # 主工作目录：时间精确的脚本 + 批量结果
-      ├─ fig4_dynamics.mx3              # Fig.4 动力学：PBC 无限薄膜 + 电反射 echo + RK4
-      ├─ fig3_switching.mx3             # Fig.3 5×4 µm 器件单脉冲翻转（固定步长）
-      ├─ macrospin_switch.mx3           # 64×64 快速翻转模板（Jp/dT_ref/KuExp/θ 旋钮）
-      ├─ run_case.py                    # 批量运行+归档：runs\<tag>\{<tag>.mx3, out\}
-      ├─ plot_table.py                  # table.txt → ΔMz/Ms、ΔT 曲线
-      ├─ plot_phase.py                  # summary.csv → Jp–Tmax 定稿相图与边界曲线
-      ├─ plot_fig4.py                   # a_f4_* → Fig.4 ΔMz(t)（平行/反平行/无 Hx）
-      ├─ plot_mechanism.py              # c0/b0、b2、b3 机制对照三面板
-      ├─ plot_quadrants.py              # q1–q4 m_final.ovf → 末态 2×2 面板
-      ├─ energy_check.py                # 能量核算 ∫J²dt·ρV（对标论文 <50 pJ）
-      ├─ fig3_switching.out/            # Fig.3 器件参考运行输出
-      ├─ fig4_dynamics.out/             # Fig.4 参考运行输出
-      └─ runs/                          # 批量结果：summary.csv + 定稿图；out/ 仅存 table/log/m_*.ovf
+README.md                              # 项目说明（本文件）
+FACTS.md                               # 事实清单：参数/约定/已核实结果
+papers/                                # 文献 PDF（NE 2020 / NC 2026 / AM 2023）
+└─ mumax3_docs/                        # mumax3 原始论文、教程与相关文献
+notes/                                 # 论文全文/翻译/交接/踩坑记录
+├─ NE_2020.md                          # 论文 markdown 版
+├─ error.md                            # mumax3 复刻踩坑记录
+├─ SOT_mumax3_交接文档.md              # 项目交接文档
+├─ 三篇论文逐句翻译整合.md             # 论文翻译整合
+└─ extracted.txt                       # 论文 PDF 抽取文本
+simulations/
+└─ mumax3_sot/                         # 主工作目录：时间精确的脚本 + 批量结果
+   ├─ fig4_dynamics.mx3                # Fig.4 动力学：PBC 无限薄膜 + 电反射 echo + RK4
+   ├─ fig3_switching.mx3               # Fig.3 5×4 µm 器件单脉冲翻转（固定步长）
+   ├─ macrospin_switch.mx3             # 64×64 快速翻转模板（Jp/dT_ref/KuExp/θ 旋钮）
+   ├─ run_case.py                      # 批量运行+归档：runs\<tag>\{<tag>.mx3, out\}
+   ├─ plot_table.py                    # table.txt → ΔMz/Ms、ΔT 曲线
+   ├─ plot_phase.py                    # summary.csv → Jp–Tmax 定稿相图与边界曲线
+   ├─ plot_fig4.py                     # a_f4_* → Fig.4 ΔMz(t)（平行/反平行/无 Hx）
+   ├─ plot_mechanism.py                # c0/b0、b2、b3 机制对照三面板
+   ├─ plot_quadrants.py                # q1–q4 m_final.ovf → 末态 2×2 面板
+   ├─ energy_check.py                  # 能量核算 ∫J²dt·ρV（对标论文 <50 pJ）
+   ├─ fig3_switching.out/              # Fig.3 器件参考运行输出
+   ├─ fig4_dynamics.out/               # Fig.4 参考运行输出
+   └─ runs/                            # 批量结果：summary.csv + 定稿图；out/ 仅存 table/log/m_*.ovf
 ```
 
-* `resource/simulations/mumax3_sot/fig4_dynamics.mx3` — 用 `SetPBC` 模拟无穷薄膜、Gaussian 脉冲、
+* `simulations/mumax3_sot/fig4_dynamics.mx3` — 用 `SetPBC` 模拟无穷薄膜、Gaussian 脉冲、
   可叠加传输线反射，输出 `T(t)`、`J(t)`、`Ms(t)`，适合直接对照论文 Fig. 4a/4b。
 
 ## 2. 快速开始
@@ -51,8 +52,8 @@ resource/
 ```powershell
 # 依赖：mumax3（本仓库用 3.12 + CUDA 12.9 验证）
 # 推荐：用 run_case.py 运行（自动归档 + 参数替换）
-python resource/simulations/mumax3_sot/run_case.py `
-    resource/simulations/mumax3_sot/macrospin_switch.mx3 b1_Jp8dT450 `
+python simulations/mumax3_sot/run_case.py `
+    simulations/mumax3_sot/macrospin_switch.mx3 b1_Jp8dT450 `
     --set Jp=8e12 J_ref=8e12 dT_ref=450
 ```
 
@@ -156,7 +157,7 @@ V=5×4 µm²×15 nm）：**Jp=6e12 时 39.7 pJ**，与论文 40 pJ 口径一致�
   Tmax≈308 K、mz_final=+0.9879（不翻转），与早期参考运行结论一致；开关型参考对应 `runs/b0_6e12`。
 
 > ⚠ **历史说明**：早期自适应步长脚本的"Jp=6e12 翻转"是脉冲被拉长到 27.6 ps 的假象
-> （详见 `resource/notes/error.md` §1.11），该批旧输出已废弃删除，并按修正脚本重跑
+> （详见 `notes/error.md` §1.11），该批旧输出已废弃删除，并按修正脚本重跑
 > （开关型 `runs/b0_6e12`、动力学型 `runs/dyn_Jp1e12_Ip`）；上表为固定步长 + 真实时间
 > 脉冲（`SetSolver(4)+FixDt` + `J(t)`）后的结果。
 
@@ -184,8 +185,8 @@ mumax3-convert -vtk out/m_final.ovf      # 给 ParaView
 
 ```powershell
 foreach ($Jp in "6e12","8e12","1.2e13") {
-    python resource/simulations/mumax3_sot/run_case.py `
-        resource/simulations/mumax3_sot/macrospin_switch.mx3 "b1_Jp$Jp" `
+    python simulations/mumax3_sot/run_case.py `
+        simulations/mumax3_sot/macrospin_switch.mx3 "b1_Jp$Jp" `
         --set "Jp=$Jp" "J_ref=$Jp" dT_ref=450
 }
 # 每次运行自动写入 runs/summary.csv（tag、t_cross_ps、recov_50ps、mz_final ...）
@@ -204,7 +205,7 @@ foreach ($Jp in "6e12","8e12","1.2e13") {
    mumax3 的 `Temp` 只加 Langevin 噪声、不缩放 `Ms/Ku`，所以这里用脚本逐步修改 `Msat`、`Ku1`。
 5. **微磁与概率（选做）**：切到 1024×800（5×4 µm 器件）+ Voronoi 晶粒各向异性扰动，
    统计不同随机种子下的 `P_sw(Jp)`，对应论文的 >91% 翻转概率和成核图像。
-6. **能耗估计**：`python resource/simulations/mumax3_sot/energy_check.py runs/<tag>`
+6. **能耗估计**：`python simulations/mumax3_sot/energy_check.py runs/<tag>`
    直接对 table 里的真实 `J(t)` 积分（`rho=81 µΩ cm`、`V=5×4 µm²×15 nm`）；
    6e12/6 ps → 39.7 pJ（与论文口径一致），本模型能翻转的案例为 70–441 pJ。
 

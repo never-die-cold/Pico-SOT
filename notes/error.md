@@ -6,34 +6,34 @@
 ```text
 E:\_SOT_MARM\
 ├─ README.md
+├─ FACTS.md
 ├─ .gitignore / .gitattributes
-└─ resource\
-   ├─ papers\                        文献 PDF（NE 2020 / NC 2026 / AM 2023）
-   │  └─ mumax3_docs\                mumax3 原始论文、教程与相关文献
-   ├─ notes\
-   │  ├─ NE_2020.md                  论文 markdown 版
-   │  ├─ error.md                    本踩坑记录
-   │  ├─ SOT_mumax3_交接文档.md      项目交接文档
-   │  ├─ 三篇论文逐句翻译整合.md     论文翻译整合
-   │  └─ extracted.txt               论文 PDF 抽取文本
-   └─ simulations\
-      └─ mumax3_sot\                 主工作目录（已跑通）
-         ├─ fig4_dynamics.mx3        图 4：宏自旋超快动力学（SOT + 焦耳加热）
-         ├─ fig3_switching.mx3       图 3：5×4 µm 器件单脉冲确定性翻转
-         ├─ macrospin_switch.mx3     64×64 快速翻转模板（时间精确，KuExp/Heating/θ 旋钮）
-         ├─ plot_table.py            table.txt 后处理/绘图
-         ├─ plot_phase.py            summary.csv → 定稿相图与边界曲线
-         ├─ plot_fig4.py             a_f4_* → Fig.4 ΔMz(t)（平行/反平行/无 Hx）
-         ├─ plot_mechanism.py        c0/b0、b2、b3 机制对照三面板
-         ├─ plot_quadrants.py        q1–q4 m_final.ovf → 末态 2×2 面板
-         ├─ energy_check.py          能量核算（∫J²dt·ρV，对标论文 <50 pJ）
-         ├─ run_case.py              批量运行+数据归档（每个参数组合一个目录）
-         ├─ runs\                    批量结果：summary.csv + <tag>\<tag>.mx3 + out\
-         ├─ fig4_dynamics.out\       图 4 的仿真输出（table.txt / ovf / png / log）
-         └─ fig3_switching.out\      图 3 的仿真输出
+├─ papers\                           文献 PDF（NE 2020 / NC 2026 / AM 2023）
+│  └─ mumax3_docs\                   mumax3 原始论文、教程与相关文献
+├─ notes\
+│  ├─ NE_2020.md                    论文 markdown 版
+│  ├─ error.md                      本踩坑记录
+│  ├─ SOT_mumax3_交接文档.md        项目交接文档
+│  ├─ 三篇论文逐句翻译整合.md       论文翻译整合
+│  └─ extracted.txt                 论文 PDF 抽取文本
+└─ simulations\
+   └─ mumax3_sot\                   主工作目录（已跑通）
+      ├─ fig4_dynamics.mx3          图 4：宏自旋超快动力学（SOT + 焦耳加热）
+      ├─ fig3_switching.mx3         图 3：5×4 µm 器件单脉冲确定性翻转
+      ├─ macrospin_switch.mx3       64×64 快速翻转模板（时间精确，KuExp/Heating/θ 旋钮）
+      ├─ plot_table.py              table.txt 后处理/绘图
+      ├─ plot_phase.py              summary.csv → 定稿相图与边界曲线
+      ├─ plot_fig4.py               a_f4_* → Fig.4 ΔMz(t)（平行/反平行/无 Hx）
+      ├─ plot_mechanism.py          c0/b0、b2、b3 机制对照三面板
+      ├─ plot_quadrants.py          q1–q4 m_final.ovf → 末态 2×2 面板
+      ├─ energy_check.py            能量核算（∫J²dt·ρV，对标论文 <50 pJ）
+      ├─ run_case.py                批量运行+数据归档（每个参数组合一个目录）
+      ├─ runs\                      批量结果：summary.csv + <tag>\<tag>.mx3 + out\
+      ├─ fig4_dynamics.out\         图 4 的仿真输出（table.txt / ovf / png / log）
+      └─ fig3_switching.out\        图 3 的仿真输出
 ```
 
-> 注：2026-09-15 目录整理，文献/笔记/仿真统一归入 `resource\`；本文中所有命令路径已同步更新。
+> 注：2026-09-15 目录整理：文献/笔记/仿真先统一归入 `resource\`，后把 `papers\`、`notes\`、`simulations\` 直接放到仓库根目录；本文中所有命令路径已同步更新。
 
 ---
 
@@ -149,11 +149,11 @@ dMz/Ms = Ms(T)*mz(t)/Ms0 - mz(t0)      // t0 取脉冲前的参考时刻
 
 ```powershell
 $mx = "E:\mumax3.12_windows_cuda12.9\mumax3.exe"
-& $mx -vet resource\simulations\mumax3_sot\fig4_dynamics.mx3                    # 只查语法
-& $mx -f -o "resource\simulations\mumax3_sot\runs\fig4_Hxp160_Ip.out" resource\simulations\mumax3_sot\fig4_dynamics.mx3
-& "E:\mumax3.12_windows_cuda12.9\mumax3-convert.exe" -png resource\simulations\mumax3_sot\runs\...\m0*.ovf
-python resource\simulations\mumax3_sot\plot_table.py "resource\simulations\mumax3_sot\runs\...\table.txt" --out fig4_sim.png
-& $mx -i resource\simulations\mumax3_sot\fig4_dynamics.mx3                      # 带浏览器实时 GUI
+& $mx -vet simulations\mumax3_sot\fig4_dynamics.mx3                    # 只查语法
+& $mx -f -o "simulations\mumax3_sot\runs\fig4_Hxp160_Ip.out" simulations\mumax3_sot\fig4_dynamics.mx3
+& "E:\mumax3.12_windows_cuda12.9\mumax3-convert.exe" -png simulations\mumax3_sot\runs\...\m0*.ovf
+python simulations\mumax3_sot\plot_table.py "simulations\mumax3_sot\runs\...\table.txt" --out fig4_sim.png
+& $mx -i simulations\mumax3_sot\fig4_dynamics.mx3                      # 带浏览器实时 GUI
 ```
 
 常用参数：`-o` 指定输出目录、`-f` 覆盖已有目录、`-vet` 只检查、`-s` 静默、`-i` 交互 GUI（http://127.0.0.1:35367/）。
@@ -163,14 +163,14 @@ python resource\simulations\mumax3_sot\plot_table.py "resource\simulations\mumax
 `run_case.py` 把"模板脚本 + 参数替换"写成独立目录并自动汇总：
 
 ```powershell
-python resource\simulations\mumax3_sot\run_case.py resource\simulations\mumax3_sot\fig3_switching.mx3 q1_Hxp_Ip --set Hx=0.160 Isign=1
-python resource\simulations\mumax3_sot\run_case.py resource\simulations\mumax3_sot\fig4_dynamics.mx3 f4_lowJ --set Jpk=2e12 dTpk=15 --no-run
+python simulations\mumax3_sot\run_case.py simulations\mumax3_sot\fig3_switching.mx3 q1_Hxp_Ip --set Hx=0.160 Isign=1
+python simulations\mumax3_sot\run_case.py simulations\mumax3_sot\fig4_dynamics.mx3 f4_lowJ --set Jpk=2e12 dTpk=15 --no-run
 ```
 
 生成的目录结构（每个物理条件一套，脚本可溯源）：
 
 ```text
-resource\simulations\mumax3_sot\runs\
+simulations\mumax3_sot\runs\
   summary.csv                  # 每个 case 一行：参数 + mz_final + switched + Tmax
   q1_Hxp_Ip\
     q1_Hxp_Ip.mx3              # 实际运行的脚本（参数已替换）
@@ -183,9 +183,9 @@ resource\simulations\mumax3_sot\runs\
 |------|------|
 | `table.txt` | 时间序列：t、mx、my、mz、E_total、T、J、Ms（`#` 开头的表头行含列名+单位） |
 | `log.txt` | 完整脚本回显 + 运行信息（版本、GPU、编译信息）——溯源用 |
-| `references.bib` | 需要引用的 mumax3 文献 |
-| `m000000.ovf / *.png` | 空间磁化分布（AutoSave 或 saveas），用于画 MOKE 显微图 |
-| `gui/` | 在线 GUI 数据 |
+| `references.bib` | mumax3 自动生成的文献引用（可再生，已列入 `.gitignore`，不保留） |
+| `m_initial.ovf / m_final.ovf / *.png` | 初态与末态磁化分布（AutoSave 的中间帧 `m0*.ovf` 已清理，可再生） |
+| `gui/` | 在线 GUI 数据（可再生，不保留） |
 
 **组织建议**：一个物理条件 = 一个 `runs\<参数标签>.out` 目录，如
 `fig4_Hxp160_Ip_J4.0e12_dT20` / `fig3_Hxn160_Im_J1.2e13_dT400`；

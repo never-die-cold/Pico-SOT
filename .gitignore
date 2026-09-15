@@ -2,9 +2,9 @@
 *.pdf
 
 # ---- paper full text extraction / translations / personal notes ----
-resource/notes/*.md
-resource/notes/extracted.txt
-!resource/notes/error.md
+notes/*.md
+notes/extracted.txt
+!notes/error.md
 
 # ---- mumax3 binary distribution (if placed at repo root) ----
 mumax3/

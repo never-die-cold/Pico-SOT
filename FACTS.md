@@ -1,13 +1,13 @@
 # 事实清单 — mumax3 复刻 NE 2020 皮秒脉冲 SOT 翻转
 
 - 项目路径：`E:\_SOT_MARM`
-- 整理日期：2026-09-15；依据：`README.md`、`resource/notes/*.md`、`resource/simulations/mumax3_sot/` 现行脚本与 `runs/summary.csv`
+- 整理日期：2026-09-15；依据：`README.md`、`notes/*.md`、`simulations/mumax3_sot/` 现行脚本与 `runs/summary.csv`
 - 标记：【论文】原论文事实｜【已核实】本仓库跑通并验证｜【约定】建模/脚本约定｜【历史】已废弃或易误解的旧信息
 
 ## 1. 目标与文献
 
 1. 目标：用 [mumax3](https://mumax.github.io/) 复现 Jhuria et al., *"Spin-orbit torque switching of a ferromagnet with picosecond electrical pulses"*, Nature Electronics **3**, 680–686 (2020)，doi:10.1038/s41928-020-00488-3。【论文】
-2. 仓库另收录：NE_2020 原文 PDF + `NE_2020.md`、NC 2026（250 MTJ 概率 Ising machine）、AM 2023（拓扑绝缘体驱动 PMA 低功耗存储）、mumax3 原始论文/教程（`resource/papers/`）。
+2. 仓库另收录：NE_2020 原文 PDF + `NE_2020.md`、NC 2026（250 MTJ 概率 Ising machine）、AM 2023（拓扑绝缘体驱动 PMA 低功耗存储）、mumax3 原始论文/教程（`papers/`）。
 3. 引用要求：原论文 + A. Vansteenkiste et al., *AIP Advances* **4**, 107133 (2014)。【约定】
 
 ## 2. 运行环境
