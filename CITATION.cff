@@ -1,0 +1,83 @@
+cff-version: 1.2.0
+message: "If you use this repository, please cite it as below, and also cite the original paper and mumax3."
+title: "PicoSOT: mumax3 replica of picosecond spin-orbit torque switching"
+abstract: "mumax3 replica of spin-orbit torque switching of a perpendicular ferromagnet with 6 ps electrical pulses (Jhuria et al., Nature Electronics 3, 680-686, 2020). Includes a time-exact LLG model, a phenomenological Joule-heating model, phase diagrams, symmetry and mechanism controls, and figure-ready plots."
+type: software
+authors:
+  - alias: never-die-cold
+    name: never-die-cold
+license: MIT
+license-url: "https://github.com/never-die-cold/Pico-SOT/blob/main/LICENSE"
+repository-code: "https://github.com/never-die-cold/Pico-SOT"
+keywords:
+  - mumax3
+  - spin-orbit torque
+  - micromagnetics
+  - magnetization switching
+  - picosecond electrical pulses
+  - LLG
+  - spintronics
+references:
+  - type: article
+    title: "Spin-orbit torque switching of a ferromagnet with picosecond electrical pulses"
+    authors:
+      - family-names: Jhuria
+        given-names: Kaushalya
+      - family-names: Hohlfeld
+        given-names: Julius
+      - family-names: Pattabi
+        given-names: Akshay
+      - family-names: Martin
+        given-names: Elodie
+      - family-names: Arriola Cordova
+        given-names: Aldo Ygnacio
+      - family-names: Shi
+        given-names: Xinping
+      - family-names: Lo Conte
+        given-names: Roberto
+      - family-names: Petit-Watelot
+        given-names: Sebastien
+      - family-names: Rojas-Sanchez
+        given-names: Juan Carlos
+      - family-names: Malinowski
+        given-names: Gregory
+      - family-names: Mangin
+        given-names: Stephane
+      - family-names: Lemaitre
+        given-names: Aristide
+      - family-names: Hehn
+        given-names: Michel
+      - family-names: Bokor
+        given-names: Jeffrey
+      - family-names: Wilson
+        given-names: Richard B.
+      - family-names: Gorchon
+        given-names: Jon
+    journal: Nature Electronics
+    volume: 3
+    issue: 11
+    start: 680
+    end: 686
+    year: 2020
+    doi: 10.1038/s41928-020-00488-3
+  - type: article
+    title: "The design and verification of MuMax3"
+    authors:
+      - family-names: Vansteenkiste
+        given-names: Arne
+      - family-names: Leliaert
+        given-names: Jonathan
+      - family-names: Dvornik
+        given-names: Mykola
+      - family-names: Helsen
+        given-names: Mathias
+      - family-names: Garcia-Sanchez
+        given-names: Felipe
+      - family-names: Van Waeyenberge
+        given-names: Bartel
+    journal: AIP Advances
+    volume: 4
+    issue: 10
+    start: 107133
+    year: 2014
+    doi: 10.1063/1.4899186
