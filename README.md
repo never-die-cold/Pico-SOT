@@ -27,24 +27,20 @@ resource/
 │  ├─ 三篇论文逐句翻译整合.md           # 论文翻译整合
 │  └─ extracted.txt                     # 论文 PDF 抽取文本
 └─ simulations/
-   ├─ kimi/                             # 早期版本（时间轴有 bug，见 notes/error.md §1.11）
-   │  ├─ SOT_ps_switching.mx3           # （历史）参数化脚本：switch / dynamics 两种模式
-   │  └─ runs/                          # （历史）参考运行 + 参数扫描汇总
-   │     ├─ sweep_summary.csv           #   ⚠ 其中 Jp=6e12 的“翻转”实为 ~28 ps 拉伸脉冲
-   │     └─ 2026-09-15_*/               #   仅作历史对照，结论以 mumax3_sot/ 为准
    └─ mumax3_sot/                       # 主工作目录：时间精确的脚本 + 批量结果
       ├─ fig4_dynamics.mx3              # Fig.4 动力学：PBC 无限薄膜 + 电反射 echo + RK4
       ├─ fig3_switching.mx3             # Fig.3 5×4 µm 器件单脉冲翻转（固定步长）
       ├─ macrospin_switch.mx3           # 64×64 快速翻转模板（Jp/dT_ref/KuExp/θ 旋钮）
       ├─ run_case.py                    # 批量运行+归档：runs\<tag>\{<tag>.mx3, out\}
       ├─ plot_table.py                  # table.txt → ΔMz/Ms、ΔT 曲线
+      ├─ plot_phase.py                  # summary.csv → Jp–Tmax 相图与边界曲线
       ├─ energy_check.py                # 能量核算 ∫J²dt·ρV（对标论文 <50 pJ）
       ├─ fig4_dynamics.out/             # Fig.4 参考运行输出
       └─ runs/                          # 批量结果：summary.csv（含 t_cross_ps/recov_50ps）
+         ├─ legacy_*/                   # 早期自适应步长参考运行（有 bug，见 notes/error.md §1.11）
+         └─ legacy_sweep_summary.csv    # 早期参数扫描汇总（同上注意事项）
 ```
 
-* `resource/simulations/kimi/SOT_ps_switching.mx3` — 宏观自旋近似（64×64、5 nm 网格），
-  可快速验证物理与极性；`RunDynamics=0` 为 6 ps 单脉冲翻转，`RunDynamics=1` 为 3.7 ps 低电流时域响应。
 * `resource/simulations/mumax3_sot/fig4_dynamics.mx3` — 用 `SetPBC` 模拟无穷薄膜、Gaussian 脉冲、
   可叠加传输线反射，输出 `T(t)`、`J(t)`、`Ms(t)`，适合直接对照论文 Fig. 4a/4b。
 
@@ -144,7 +140,7 @@ V=5×4 µm²×15 nm）：**Jp=6e12 时 39.7 pJ**，与论文 40 pJ 口径一致�
   `Hx=0` 时 ±I 曲线重合且无振荡；平行组 (Hx+,I+) 与 (Hx−,I−) 重合、
   反平行组 (Hx+,I−) 与 (Hx−,I+) 重合，两组 ΔMz 相位相反；T(t) 在 24 ps 处出现反射次级峰。
 
-> ⚠ **历史说明**：`kimi/runs` 中"Jp=6e12 翻转"是未固定步长导致脉冲被拉长到
+> ⚠ **历史说明**：`runs/legacy_*` 中"Jp=6e12 翻转"是未固定步长导致脉冲被拉长到
 > 27.6 ps 的假象（详见 `resource/notes/error.md` §1.11）；上表为固定步长 + 真实时间
 > 脉冲（`SetSolver(4)+FixDt` + `J(t)`）后的结果。
 
@@ -168,23 +164,15 @@ mumax3-convert -png out/m_final.ovf      # 快速出图
 mumax3-convert -vtk out/m_final.ovf      # 给 ParaView
 ```
 
-参数扫描（示例：翻转阈值 vs Jp）：
+参数扫描（示例：翻转阈值 vs Jp，`J_ref=Jp` 即 `dT ∝ J²`）：
 
-```python
-import subprocess, pathlib, re, csv
-base = pathlib.Path("resource/simulations/kimi/SOT_ps_switching.mx3").read_text(encoding="utf-8")
-mx = r"E:\mumax3.12_windows_cuda12.9\mumax3.exe"
-rows = []
-for Jp in [6e12, 9e12, 1.2e13]:
-    d = pathlib.Path("resource/simulations/kimi/runs") / f"J{Jp:.0e}_Hx160mT_Ipos"
-    d.mkdir(parents=True, exist_ok=True)
-    (d / "run.mx3").write_text(base.replace("Jp      := 6e12", f"Jp      := {Jp:g}"),
-                               encoding="utf-8")
-    subprocess.run([mx, "-f", "-s", "-o", str(d / "out"), str(d / "run.mx3")], check=True)
-    log = (d / "out" / "log.txt").read_text(encoding="utf-8", errors="ignore")
-    rows.append({"Jp": Jp, "mz_final": float(re.search(r"mz after pulse = (\S+)", log).group(1))})
-with open("resource/simulations/kimi/runs/sweep_summary.csv", "w", newline="", encoding="utf-8") as f:
-    w = csv.DictWriter(f, fieldnames=["Jp", "mz_final"]); w.writeheader(); w.writerows(rows)
+```powershell
+foreach ($Jp in "6e12","8e12","1.2e13") {
+    python resource/simulations/mumax3_sot/run_case.py `
+        resource/simulations/mumax3_sot/macrospin_switch.mx3 "b1_Jp$Jp" `
+        --set "Jp=$Jp" "J_ref=$Jp" dT_ref=450
+}
+# 每次运行自动写入 runs/summary.csv（tag、t_cross_ps、recov_50ps、mz_final ...）
 ```
 
 ## 6. 仿真路线
@@ -206,7 +194,7 @@ with open("resource/simulations/kimi/runs/sweep_summary.csv", "w", newline="", e
 
 ## 7. 已知局限
 
-* `kimi/` 下的早期运行未固定步长，脉冲被拉长到 ~28 ps（`notes/error.md` §1.11），**不可用于定量结论**；
+* `runs/legacy_*` 下的早期运行未固定步长，脉冲被拉长到 ~28 ps（`notes/error.md` §1.11），**不可用于定量结论**（旧脚本已删除，数据仅作证据）；
 * `macrospin_switch.mx3` / `fig3_switching.mx3` 为均匀 Ku 模型，未含成核/畴壁与随机性；
 * 加热为唯象模型（`dT ∝ J²` 低通 + `Ms(T)/Ku(T)` 标度律），精确拟合应以论文 SI 为准；
 * 传输线反射（echo）在 `fig4_dynamics.mx3` 中以叠加延迟脉冲近似；

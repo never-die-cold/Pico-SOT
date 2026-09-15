@@ -6,11 +6,6 @@ resource/notes/*.md
 resource/notes/extracted.txt
 !resource/notes/error.md
 
-# ---- legacy broken script and old outputs ----
-resource/simulations/kimi/SOT_ps_switching_v1_old.mx3
-resource/simulations/kimi/SOT_ps_switching.out/
-resource/simulations/kimi/test_run/
-
 # ---- mumax3 binary distribution (if placed at repo root) ----
 mumax3/
 
