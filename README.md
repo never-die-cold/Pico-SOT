@@ -37,8 +37,6 @@ resource/
       ├─ energy_check.py                # 能量核算 ∫J²dt·ρV（对标论文 <50 pJ）
       ├─ fig4_dynamics.out/             # Fig.4 参考运行输出
       └─ runs/                          # 批量结果：summary.csv（含 t_cross_ps/recov_50ps）
-         ├─ legacy_*/                   # 早期自适应步长参考运行（有 bug，见 notes/error.md §1.11）
-         └─ legacy_sweep_summary.csv    # 早期参数扫描汇总（同上注意事项）
 ```
 
 * `resource/simulations/mumax3_sot/fig4_dynamics.mx3` — 用 `SetPBC` 模拟无穷薄膜、Gaussian 脉冲、
@@ -140,8 +138,12 @@ V=5×4 µm²×15 nm）：**Jp=6e12 时 39.7 pJ**，与论文 40 pJ 口径一致�
   `Hx=0` 时 ±I 曲线重合且无振荡；平行组 (Hx+,I+) 与 (Hx−,I−) 重合、
   反平行组 (Hx+,I−) 与 (Hx−,I+) 重合，两组 ΔMz 相位相反；T(t) 在 24 ps 处出现反射次级峰。
 
-> ⚠ **历史说明**：`runs/legacy_*` 中"Jp=6e12 翻转"是未固定步长导致脉冲被拉长到
-> 27.6 ps 的假象（详见 `resource/notes/error.md` §1.11）；上表为固定步长 + 真实时间
+- **早期参考的修正重跑**（`RunDynamics=1`、3.7 ps FWHM、Jp=1e12）：`runs/dyn_Jp1e12_Ip`，
+  Tmax≈308 K、mz_final=+0.9879（不翻转），与早期参考运行结论一致；开关型参考对应 `runs/b0_6e12`。
+
+> ⚠ **历史说明**：早期自适应步长脚本的"Jp=6e12 翻转"是脉冲被拉长到 27.6 ps 的假象
+> （详见 `resource/notes/error.md` §1.11），该批旧输出已废弃删除，并按修正脚本重跑
+> （开关型 `runs/b0_6e12`、动力学型 `runs/dyn_Jp1e12_Ip`）；上表为固定步长 + 真实时间
 > 脉冲（`SetSolver(4)+FixDt` + `J(t)`）后的结果。
 
 ## 5. 输出与后处理
@@ -194,7 +196,7 @@ foreach ($Jp in "6e12","8e12","1.2e13") {
 
 ## 7. 已知局限
 
-* `runs/legacy_*` 下的早期运行未固定步长，脉冲被拉长到 ~28 ps（`notes/error.md` §1.11），**不可用于定量结论**（旧脚本已删除，数据仅作证据）；
+* 早期自适应步长版本的输出（脉冲被拉长到 ~28 ps，`notes/error.md` §1.11）**已废弃删除**，等效案例已用修正脚本重跑（开关型 `runs/b0_6e12`、动力学型 `runs/dyn_Jp1e12_Ip`）；现结论全部来自修正后的脚本；
 * `macrospin_switch.mx3` / `fig3_switching.mx3` 为均匀 Ku 模型，未含成核/畴壁与随机性；
 * 加热为唯象模型（`dT ∝ J²` 低通 + `Ms(T)/Ku(T)` 标度律），精确拟合应以论文 SI 为准；
 * 传输线反射（echo）在 `fig4_dynamics.mx3` 中以叠加延迟脉冲近似；

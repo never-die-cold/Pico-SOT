@@ -26,8 +26,6 @@ E:\_SOT_MARM\
          ├─ energy_check.py          能量核算（∫J²dt·ρV，对标论文 <50 pJ）
          ├─ run_case.py              批量运行+数据归档（每个参数组合一个目录）
          ├─ runs\                    批量结果：summary.csv + <tag>\<tag>.mx3 + out\
-         │  ├─ legacy_*\             早期自适应步长参考运行（仅作历史证据，见 1.11）
-         │  └─ legacy_sweep_summary.csv
          ├─ fig4_dynamics.out\       图 4 的仿真输出（table.txt / ovf / png / log）
          └─ fig3_switching.out\      图 3 的仿真输出
 ```
@@ -130,10 +128,10 @@ dMz/Ms = Ms(T)*mz(t)/Ms0 - mz(t0)      // t0 取脉冲前的参考时刻
 - 现状（本工作扫描结果，供起点）：`Jpk ≥ 1.2e13 A/m²` 且 `dTpk ≈ 400 K`（峰值 T≈680 K < Tc=800 K，论文排除了 HAMR 情形）时，~50 ps 内平均 mz 过零、最终 mz≈−0.96；论文模型预测最快 16 ps。**要精确复刻图 3 需从 SI 取参数或自行拟合 Jpk/dTpk/tauC。**
 
 ### 1.11 64×64 宏旋脚本的“6 ps”实为 ~28 ps（自适应步长再次踩坑）
-- 现象：`runs\legacy_switch_Jp6e12_*` 在 Jp=6e12 就翻转，看似复现论文上限；但能量核算得 ∫J²dt = 7.76e14 → **189 pJ**（名义应 ~40 pJ）。
+- 现象：早期自适应步长脚本在 Jp=6e12 就翻转，看似复现论文上限；但能量核算得 ∫J²dt = 7.76e14 → **189 pJ**（名义应 ~40 pJ）。
 - 原因：该脚本（上一轮重写版）用循环计数驱动脉冲、未固定步长；默认 RK45 在近平衡宏自旋上内部 dt≈1 ps，`run(0.2 ps)` 实际推进 1 ps → 脉冲在真实时间轴上被拉长到 **FWHM 27.6 ps**，积分增大 4.8 倍。
 - 解决：新增 `macrospin_switch.mx3`：脉冲写成内置时间 t 的函数，`SetSolver(4); FixDt=5e-14`，温度 ODE 用实测 Δt 积分。修正后实测 FWHM=5.85 ps、∫J²dt=1.63e14（39.7 pJ，与论文 40 pJ 口径一致），**Jp=6e12 不再翻转**。
-- 结论：`runs\legacy_*` 中两条“参考运行”应视为 **~28 ps 脉冲** 的结果，不能当作 6 ps 结论引用。
+- 结论：早期两条“参考运行”实为 **~28 ps 脉冲** 的结果，不能当作 6 ps 结论引用；旧输出已废弃删除，等效案例用修正脚本重跑（开关型 `runs/b0_6e12`、动力学型 `runs/dyn_Jp1e12_Ip`）。
 
 ### 1.12 `Pol=0` 会被断言拦截（做 θ=0 测试时）
 - 现象：设 `Pol=0` + J≠0 时仿真直接中止。
@@ -261,4 +259,4 @@ resource\simulations\mumax3_sot\runs\
 
 - `macrospin_switch.mx3`（**新增规范模板**）：64×64 快速版，时间精确（实测 FWHM=5.85 ps@6 ps 档），带 `Jp / dT_ref / J_ref / tau_cool / Heating / KuExp / Pol / EpsilonPrime / I_sign / InitMz / Hx_mT / RunDynamics` 旋钮；配合 `run_case.py` 批量运行，`summary.csv` 自动记录 `t_cross_ps`（过零时刻）与 `recov_50ps`（过零后 50 ps 恢复率）。
 - `fig3_switching.mx3` / `fig4_dynamics.mx3`：5×4 µm 全器件与宏自旋动力学脚本，时间精确，继续作主力。
-- `runs/legacy_switch_Jp6e12_Hx160mT_Ipos`、`runs/legacy_dynamics_Jp1e12_Hx160mT_Ipos` 与 `runs/legacy_sweep_summary.csv`：早期自适应步长版本的参考运行（旧脚本已删除），存在 1.11 的步长问题（“6 ps”实为 ~28 ps FWHM），**仅作历史证据，结论需按此修正**（其中 Jp=6e12 的“翻转”不能对标 6 ps 实验）。
+- 早期自适应步长版本的脚本与输出：**已废弃删除**（存在 1.11 的步长问题，“6 ps”实为 ~28 ps FWHM），等效案例已用修正脚本重跑：开关型 `runs/b0_6e12`（6e12 不翻转）、动力学型 `runs/dyn_Jp1e12_Ip`（Tmax≈308 K）。
