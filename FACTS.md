@@ -1,4 +1,4 @@
-# 事实清单 — mumax3 复刻 NE 2020 皮秒脉冲 SOT 翻转
+# PicoSOT 事实清单 — mumax3 复刻 NE 2020 皮秒脉冲 SOT 翻转
 
 - 项目路径：`E:\_SOT_MARM`
 - 整理日期：2026-09-15；依据：`README.md`、`notes/*.md`、`simulations/mumax3_sot/` 现行脚本与 `runs/summary.csv`

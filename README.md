@@ -1,4 +1,6 @@
-# mumax3 replica: spin-orbit torque switching with picosecond electrical pulses
+# PicoSOT
+
+**mumax3 replica: spin-orbit torque switching with picosecond electrical pulses**
 
 用 [mumax3](https://mumax.github.io/) 复现：
 
