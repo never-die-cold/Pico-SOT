@@ -38,8 +38,9 @@ resource/
       ├─ plot_mechanism.py              # c0/b0、b2、b3 机制对照三面板
       ├─ plot_quadrants.py              # q1–q4 m_final.ovf → 末态 2×2 面板
       ├─ energy_check.py                # 能量核算 ∫J²dt·ρV（对标论文 <50 pJ）
+      ├─ fig3_switching.out/            # Fig.3 器件参考运行输出
       ├─ fig4_dynamics.out/             # Fig.4 参考运行输出
-      └─ runs/                          # 批量结果：summary.csv（含 t_cross_ps/recov_50ps）
+      └─ runs/                          # 批量结果：summary.csv + 定稿图；out/ 仅存 table/log/m_*.ovf
 ```
 
 * `resource/simulations/mumax3_sot/fig4_dynamics.mx3` — 用 `SetPBC` 模拟无穷薄膜、Gaussian 脉冲、

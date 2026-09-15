@@ -89,7 +89,7 @@
 
 ## 7. 输出与归档
 
-1. 每个 case：`runs/<tag>/<tag>.mx3`（实际运行的脚本副本）+ `runs/<tag>/out/`（`table.txt`、`log.txt`、`*.ovf`、`gui/`、`references.bib`）。【约定】
+1. 每个 case：`runs/<tag>/<tag>.mx3`（实际运行的脚本副本）+ `runs/<tag>/out/`（仅保留 `table.txt`、`log.txt`、`m_initial.ovf`、`m_final.ovf`）。中间帧 `m0*.ovf`、`gui`、`references.bib` 属可再生的运行产物，已清理并列入 `.gitignore`。【约定】
 2. `table.txt` 列（macrospin）：`t`(s), `mx`, `my`, `mz`, `E_total`, `J`(A/m²), `T`(K)；fig3/fig4 脚本另有 `Ms`(A/m)。
 3. `summary.csv` 列：`tag, time, t_end_ps, mz_final, switched, Tmax_K, Hx, Isign, t_cross_ps, recov_50ps, Jp, J_ref, dT_ref, Pol, EpsilonPrime, KuExp, echo, ted, Heating, RunDynamics, Hx_mT`。
 4. `recov_50ps` = |mz(t_cross + 50 ps)| / |mz_final|（`run_case.py` 定义；无过零则留空）。

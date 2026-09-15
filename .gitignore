@@ -13,3 +13,8 @@ mumax3/
 gui
 Thumbs.db
 .DS_Store
+
+# ---- mumax3 per-run regenerated artifacts ----
+references.bib
+*.out/m[0-9]*.ovf
+runs/**/out/m[0-9]*.ovf
