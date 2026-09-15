@@ -33,7 +33,10 @@ resource/
       ├─ macrospin_switch.mx3           # 64×64 快速翻转模板（Jp/dT_ref/KuExp/θ 旋钮）
       ├─ run_case.py                    # 批量运行+归档：runs\<tag>\{<tag>.mx3, out\}
       ├─ plot_table.py                  # table.txt → ΔMz/Ms、ΔT 曲线
-      ├─ plot_phase.py                  # summary.csv → Jp–Tmax 相图与边界曲线
+      ├─ plot_phase.py                  # summary.csv → Jp–Tmax 定稿相图与边界曲线
+      ├─ plot_fig4.py                   # a_f4_* → Fig.4 ΔMz(t)（平行/反平行/无 Hx）
+      ├─ plot_mechanism.py              # c0/b0、b2、b3 机制对照三面板
+      ├─ plot_quadrants.py              # q1–q4 m_final.ovf → 末态 2×2 面板
       ├─ energy_check.py                # 能量核算 ∫J²dt·ρV（对标论文 <50 pJ）
       ├─ fig4_dynamics.out/             # Fig.4 参考运行输出
       └─ runs/                          # 批量结果：summary.csv（含 t_cross_ps/recov_50ps）
@@ -117,7 +120,9 @@ V=5×4 µm²×15 nm）：**Jp=6e12 时 39.7 pJ**，与论文 40 pJ 口径一致�
 | Jp=1.2e13, dT=450 K | 725 K | 50.1 ps | −0.988 | 158.9 pJ | 翻转 |
 | Jp=2.0e13, dT=450 K | 725 K | **39.0 ps（最快）** | −0.988 | 441 pJ | 论文模型预测最快 16 ps，差距来自 SI 参数 |
 
-- 四象限：`sign(mz_final) = −sign(Hx·I)`，`Hx=0` 不翻转（与论文 Fig. 3 一致，见 §3 表）。
+- 四象限：`sign(mz_final) = −sign(Hx·I)`，`Hx=0` 不翻转（与论文 Fig. 3 一致，见 §3 表与 C2 对照）；
+  末态面板 `runs/q_quadrants.png`（`plot_quadrants.py`）显示四个象限体内均为均匀单畴、无畴壁
+  （仅开边界的边缘列被钉扎）。
 - **B2 θ≈0**（`Pol=1e-4, EpsilonPrime=0`，Jp=8e12）：dT=300 K 不翻；
   dT=450/600/800 K 分别在 **85.9/92.3/122.4 ps** 翻转 → 定性复现 SI Fig. 5
   （仅靠热各向异性力矩也能翻转，但更慢、需要更强加热）。
@@ -131,10 +136,18 @@ V=5×4 µm²×15 nm）：**Jp=6e12 时 39.7 pJ**，与论文 40 pJ 口径一致�
 - **C1 相图边界中间点**（J_ref=Jp）：9e12/dT300 不翻（末态 +0.933，深度瞬态）；
   8e12/dT375 翻 66.5 ps；7e12/dT450 翻 61.0 ps；6e12/dT600 翻 80.5 ps。
   边界定位：Tmax≈583 K 线上 Jc∈(9,10]e12；Jp=8e12 竖线上 dTc∈(300,375]K；
-  7e12 在 Tmax=725 K 可翻，6e12 需 Tmax≳867 K（更热更慢）。三张草稿图
-  `runs/phase_map_draft.png`、`phase_traces_draft.png`、`phase_speed_draft.png`
-  （脚本 `plot_phase.py`）。
-- **Fig.4 动力学（含反射 `echo=0.3, ted=24 ps`，图 `runs/fig4_full.png`）**：
+  7e12 在 Tmax=725 K 可翻，6e12 需 Tmax≳867 K（更热更慢）。定稿图
+  `runs/phase_map.png`、`runs/phase_traces.png`、`runs/phase_speed.png`
+  （脚本 `plot_phase.py`；相图中的灰色菱形为 C2 `Hx=0` 对照点，不参与边界拟合）。
+- **C2 对称性对照 `Hx=0`**（`runs/c2_Hx0_Jp8_dT450`，与 `b1_Jp8_dT450` 完全同参数
+  `Jp=8e12`、`dT_ref=450`、`I_sign=+1`，仅 `Hx_mT=0`）：瞬态最低 mz=0.80（40.2 ps）后
+  恢复，末态 **+1.0000**、无过零（`t_cross` 空，Tmax=725 K）→ 与 `Hx=+160 mT` 时
+  58.6 ps 翻转形成对照，确认翻转需要 `Hx≠0` 破缺对称性。
+- **机制对照总图** `runs/mechanism_compare.png`（脚本 `plot_mechanism.py`）：
+  (a) c0/b0 加热开/关、(b) b2 θ≈0、(c) b3 Ku(T) 冻结三面板并排；实线/虚线为各条件的
+  对照臂，同色细点划线为对应 T(t)。
+- **Fig.4 动力学（含反射 `echo=0.3, ted=24 ps`，图 `runs/fig4_full.png`，脚本 `plot_fig4.py`，
+  图例按 平行/反平行/无 Hx 三组）**：
   `Hx=0` 时 ±I 曲线重合且无振荡；平行组 (Hx+,I+) 与 (Hx−,I−) 重合、
   反平行组 (Hx+,I−) 与 (Hx−,I+) 重合，两组 ΔMz 相位相反；T(t) 在 24 ps 处出现反射次级峰。
 

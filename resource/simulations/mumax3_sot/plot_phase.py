@@ -1,15 +1,15 @@
-"""Draft phase-diagram plots from runs/summary.csv (Jp, Tmax) switching map.
+"""Final phase-diagram plots from runs/summary.csv (Jp, Tmax) switching map.
 
 Usage:
     python plot_phase.py [--summary runs/summary.csv] [--outdir runs]
 
-Outputs (drafts, for review):
-    runs/phase_map_draft.png      Jp vs Tmax scatter + boundary guide
-    runs/phase_traces_draft.png   mz(t) and T(t) of the boundary cases
-    runs/phase_speed_draft.png    crossing time vs Jp, final mz vs Tmax
+Outputs:
+    runs/phase_map.png      Jp vs Tmax scatter + boundary guide
+    runs/phase_traces.png   mz(t) and T(t) of the boundary cases
+    runs/phase_speed.png    crossing time vs Jp, final mz vs Tmax
 
-Only heating-on, default-theta (Pol=0.20, KuExp>0) macrospin cases are
-included; B2 (theta~0) and B3 (no Ku(T)) are excluded.
+B2 (theta~0) and B3 (no Ku(T)) cases are excluded; C0 (heating off) points
+stay on the T=300 K line and C2 (Hx=0) is shown separately as a control.
 """
 import argparse
 import csv
@@ -37,6 +37,7 @@ def load_points(summary):
             if kuexp and float(kuexp) == 0.0:
                 continue
             mz = float(row["mz_final"])
+            hx = row.get("Hx") or row.get("Hx_mT") or ""
             pts.append({
                 "tag": row["tag"],
                 "Jp": float(row["Jp"]),
@@ -45,6 +46,9 @@ def load_points(summary):
                 "mz": mz,
                 "t_cross": float(row["t_cross_ps"]) if row["t_cross_ps"] else np.nan,
                 "heating": int(row.get("Heating") or 1),
+                # Hx=0 is a symmetry-control case, not a point on the
+                # (Jp, Tmax) switching boundary
+                "Hx": float(hx) if hx else None,
             })
     assert pts, "no phase points found"
     return pts
@@ -71,23 +75,35 @@ def style(ax):
 def fig_map(pts, out):
     fig, ax = plt.subplots(figsize=(5.6, 4.2), constrained_layout=True)
     for p in pts:
+        if p["Hx"] == 0:
+            ax.scatter(p["Jp"] / 1e12, p["Tmax"], s=48, facecolors="none",
+                       edgecolors="gray", marker="D", lw=1.4, zorder=3)
+            continue
         c = "crimson" if p["mz"] <= -0.9 else ("darkorange" if p["mz"] < 0 else "tab:blue")
         m = "o" if p["mz"] <= -0.9 else ("^" if p["mz"] < 0 else "s")
         filled = p["mz"] < 0
         ax.scatter(p["Jp"] / 1e12, p["Tmax"], s=42, facecolors=c if filled else "none",
                    edgecolors=c, marker=m, lw=1.4, zorder=3)
-    # eye-guide through the known boundary midpoints (draft only)
+    # eye-guide through the measured boundary midpoints
     gx = [10.5, 9.5, 8.0, 7.0, 6.0]
     gy = [583, 583, 619, 700, 810]
-    ax.plot(gx, gy, "k--", lw=1.0, alpha=0.6, label="boundary guide (draft)")
+    ax.plot(gx, gy, "k--", lw=1.0, alpha=0.6, label="switching boundary (guide)")
     ax.axhline(800, color="gray", ls=":", lw=0.8)
     ax.text(6.05, 806, r"$T_c\approx800$ K", fontsize=8, color="gray")
-    ax.scatter([], [], facecolors="none", edgecolors="crimson", marker="o", label="switched")
+    ax.scatter([], [], color="crimson", marker="o", label="switched")
     ax.scatter([], [], color="darkorange", marker="^", label="partial")
     ax.scatter([], [], facecolors="none", edgecolors="tab:blue", marker="s", label="not switched")
+    ax.scatter([], [], facecolors="none", edgecolors="gray", marker="D",
+               label="Hx=0 control (no flip)")
+    if any(p["Hx"] == 0 for p in pts):
+        p = next(p for p in pts if p["Hx"] == 0)
+        ax.annotate("C2: Hx=0\nno flip", xy=(p["Jp"] / 1e12, p["Tmax"]),
+                    xytext=(p["Jp"] / 1e12 + 0.6, p["Tmax"] - 65),
+                    fontsize=8, color="gray",
+                    arrowprops=dict(arrowstyle="->", color="gray", lw=0.8))
     ax.set_xlabel(r"$J_p$ ($10^{12}$ A/m$^2$)")
     ax.set_ylabel(r"$T_{max}$ (K)")
-    ax.set_title("Switching phase map (6 ps sech$^2$, draft)")
+    ax.set_title("Switching phase map (6 ps sech$^2$)")
     ax.legend(fontsize=8, loc="lower right")
     style(ax)
     fig.savefig(out, dpi=200)
@@ -129,6 +145,7 @@ def fig_traces(tags, out):
 
 
 def fig_speed(pts, out):
+    pts = [p for p in pts if p["Hx"] != 0]  # Hx=0 control is not a phase point
     fig, ax = plt.subplots(1, 2, figsize=(9.2, 3.4), constrained_layout=True)
     groups = {}
     for p in pts:
@@ -170,10 +187,10 @@ def main():
               % (p["tag"], p["Jp"] / 1e12, p["Tmax"], p["mz"],
                  "%.1f" % p["t_cross"] if p["t_cross"] == p["t_cross"] else "-"))
 
-    fig_map(pts, os.path.join(args.outdir, "phase_map_draft.png"))
+    fig_map(pts, os.path.join(args.outdir, "phase_map.png"))
     fig_traces(["c1_Jp9_dT300", "c1_Jp8_dT375", "c1_Jp7_dT450", "c1_Jp6_dT600"],
-               os.path.join(args.outdir, "phase_traces_draft.png"))
-    fig_speed(pts, os.path.join(args.outdir, "phase_speed_draft.png"))
+               os.path.join(args.outdir, "phase_traces.png"))
+    fig_speed(pts, os.path.join(args.outdir, "phase_speed.png"))
     return 0
 
 
