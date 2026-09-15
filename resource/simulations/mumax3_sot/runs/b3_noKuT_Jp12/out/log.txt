@@ -1,0 +1,142 @@
+//mumax 3.12 [windows_amd64 go1.26.0(gc) CUDA-12.9]
+//commit hash: 6e5c98bb
+//CPU info: Unknown, Error: exec: "wmic": executable file not found in %PATH%
+//GPU info: NVIDIA GeForce RTX 5060 Laptop GPU(8150MB), CUDA Driver 13.2, cc=12.0, using cc=120 PTX
+//OS  info: Windows OS, Hostname: never-die-cold
+//Timestamp: 2026-09-15 19:31:27
+//(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium
+//This is free software without any warranty. See license.txt
+//********************************************************************//
+//  If you use mumax in any work or publication,                      //
+//  we kindly ask you to cite the references in references.bib        //
+//********************************************************************//
+//output directory: E:\_SOT_MARM\resource\simulations\mumax3_sot\runs\b3_noKuT_Jp12\out/
+RunDynamics := 0
+CaseName := "switch"
+I_sign := 1
+InitMz := 1
+Hx_mT := 160
+Jp := 1.2e13
+Heating := 1
+dT_ref := 300
+J_ref := 1.2e13
+tau_cool := 100e-12
+t_free := 400e-12
+KuExp := 0
+Nx := 64
+Ny := 64
+SetGridSize(Nx, Ny, 1)
+SetCellSize(5e-9, 5e-9, 1e-9)
+// WARNING: cell size was set to a high aspect ratio.
+//          Calculation of demag kernel may take longer than usual.
+//          Note that this can exacerbate discretization anisotropy.
+Ms_val := 1.3e6
+Msat = Ms_val
+Aex = 3e-11
+alpha = 0.15
+Ha_T := 1.0
+Keff := 0.5 * Ms_val * Ha_T
+Ku1_0 := Keff + 0.5*mu0*Ms_val*Ms_val
+Ku1 = Ku1_0
+AnisU = vector(0, 0, 1)
+FixedLayer = vector(0, 1, 0)
+Pol = 0.20
+EpsilonPrime = 0.05
+Lambda = 1
+DisableZhangLiTorque = true
+FreeLayerThickness = 1e-9
+Hx := Hx_mT * 1e-3
+B_ext = vector(Hx, 0, 0)
+tp := 0.0
+stp := 0.0
+if RunDynamics == 1 {
+	CaseName = "dynamics"
+	tp = 3.7e-12
+	stp = 0.1e-12
+} else {
+	tp = 6e-12
+	stp = 0.2e-12
+}
+t0p := 4 * tp
+Tc_K := 800.0
+T_amb := 300.0
+beta_cc := 0.34
+H_peak := 0.756 * tp / tau_cool
+J_cur := 0.0
+h_th := 0.0
+fM := 1.0
+SetSolver(4)
+FixDt = 5e-14
+OutputFormat = OVF2_BINARY
+TableAutoSave(stp / 2)
+TableAdd(E_total)
+TableAddVar(J_cur+0.0, "J", "A/m2")
+TableAddVar(T_amb+dT_ref*h_th/H_peak, "T", "K")
+m = Uniform(0, 0, InitMz)
+J_cur = 0.0
+J = vector(0, 0, 0)
+relax()
+saveas(m, "m_initial")
+print("Case=", CaseName, " I_sign=", I_sign, " InitMz=", InitMz, " Hx(mT)=", Hx_mT)
+//Case= switch  I_sign= 1  InitMz= 1  Hx(mT)= 160
+print("relax mz =", m.average().Z())
+//relax mz = 0.9878883361816406
+J = vector(0, 0, -I_sign*Jp*4/((exp(1.763*(t-t0p)/tp)+exp(-1.763*(t-t0p)/tp))*(exp(1.763*(t-t0p)/tp)+exp(-1.763*(t-t0p)/tp))))
+tprev := 0.0
+for ti := 0.0; ti < 8*tp+stp; ti += stp {
+	tb := t
+	ex := exp(1.763 * (tb - t0p) / tp)
+	s2 := 4 / ((ex + 1/ex) * (ex + 1/ex))
+	J_cur = -I_sign * Jp * s2
+	dtr := tb - tprev
+	if Heating == 1 {
+		decay := exp(-dtr / tau_cool)
+		q := (J_cur / J_ref) * (J_cur / J_ref)
+		h_th = h_th*decay + q*(1-decay)
+		T_now := T_amb + dT_ref*h_th/H_peak
+		fr := (Tc_K - T_now) / (Tc_K - T_amb)
+		fr = 0.5 * (fr + abs(fr))
+		fM = pow(fr, beta_cc)
+		Msat = Ms_val * fM
+		Ku1 = Ku1_0 * pow(fM, KuExp)
+	}
+	tprev = tb
+	run(stp)
+}
+J = vector(0, 0, 0)
+J_cur = 0.0
+dtrun := 10e-12
+nfree := t_free / dtrun
+for k := 0; k < nfree; k++ {
+	tb := t
+	dtr := tb - tprev
+	if Heating == 1 {
+		decay := exp(-dtr / tau_cool)
+		h_th = h_th * decay
+		T_now := T_amb + dT_ref*h_th/H_peak
+		fr := (Tc_K - T_now) / (Tc_K - T_amb)
+		fr = 0.5 * (fr + abs(fr))
+		fM = pow(fr, beta_cc)
+		Msat = Ms_val * fM
+		Ku1 = Ku1_0 * pow(fM, KuExp)
+	}
+	tprev = tb
+	run(dtrun)
+}
+saveas(m, "m_final")
+mzavg := m.average().Z()
+print("mz after pulse =", mzavg)
+//mz after pulse = 0.988157331943512
+if RunDynamics == 0 {
+	if InitMz*mzavg < -0.5 {
+		print("result: switched")
+	} else {
+		print("result: NOT switched (raise Jp / dT_ref, check Hx / I_sign)")
+	}
+}
+//result: NOT switched (raise Jp / dT_ref, check Hx / I_sign)
+//********************************************************************//
+//Please cite the following references, relevant for your simulation. //
+//See bibtex file in output folder for justification.                 //
+//********************************************************************//
+//   * Vansteenkiste et al., AIP Adv. 4, 107133 (2014).

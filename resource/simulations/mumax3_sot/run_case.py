@@ -47,7 +47,22 @@ def read_table(path):
     t = rows[-1][idx["t"]]
     mz = rows[-1][idx["mz"]]
     tmax = max(r[idx["T"]] for r in rows) if "T" in idx else float("nan")
-    return t, mz, tmax
+
+    mz0 = rows[0][idx["mz"]]
+    s0 = 1.0 if mz0 >= 0 else -1.0
+    t_cross = float("nan")
+    recov = float("nan")
+    for r in rows:
+        if r[idx["mz"]] * s0 < 0:
+            t_cross = r[idx["t"]]
+            break
+    if t_cross == t_cross:  # not NaN
+        for r in rows:
+            if r[idx["t"]] >= t_cross + 50e-12:
+                if abs(mz) > 1e-9:
+                    recov = abs(r[idx["mz"]]) / abs(mz)
+                break
+    return t, mz, tmax, t_cross, recov
 
 
 def main():
@@ -96,11 +111,13 @@ def main():
     table = os.path.join(out_dir, "table.txt")
     if not os.path.isfile(table):
         raise SystemExit("no table.txt produced")
-    t_end, mz, tmax = read_table(table)
+    t_end, mz, tmax, t_cross, recov = read_table(table)
 
     row = {"tag": args.tag, "time": datetime.datetime.now().isoformat(timespec="seconds"),
            "t_end_ps": "%.1f" % (t_end * 1e12), "mz_final": "%.4f" % mz,
-           "switched": int(mz < 0), "Tmax_K": "%.0f" % tmax}
+           "switched": int(mz < 0), "Tmax_K": "%.0f" % tmax,
+           "t_cross_ps": "" if t_cross != t_cross else "%.1f" % (t_cross * 1e12),
+           "recov_50ps": "" if recov != recov else "%.2f" % recov}
     row.update(sets)
     summary = os.path.join(root, "runs", SUMMARY)
     rows, fields = [], []

@@ -23,7 +23,9 @@ E:\_SOT_MARM\
       └─ mumax3_sot\                 主工作目录（已跑通）
          ├─ fig4_dynamics.mx3        图 4：宏自旋超快动力学（SOT + 焦耳加热）
          ├─ fig3_switching.mx3       图 3：5×4 µm 器件单脉冲确定性翻转
+         ├─ macrospin_switch.mx3     64×64 快速翻转模板（时间精确，KuExp/Heating/θ 旋钮）
          ├─ plot_table.py            table.txt 后处理/绘图
+         ├─ energy_check.py          能量核算（∫J²dt·ρV，对标论文 <50 pJ）
          ├─ run_case.py              批量运行+数据归档（每个参数组合一个目录）
          ├─ runs\                    批量结果：summary.csv + <tag>\<tag>.mx3 + out\
          ├─ fig4_dynamics.out\       图 4 的仿真输出（table.txt / ovf / png / log）
@@ -127,6 +129,17 @@ dMz/Ms = Ms(T)*mz(t)/Ms0 - mz(t0)      // t0 取脉冲前的参考时刻
 - 原因：论文正文只给了能量上限估计和拟合出的 θ；加热模型（`Ms(T)`、`Ku(T)` 的具体幂律、`dT`、热弛豫时间）在 Supplementary Information 里，未公开在正文。
 - 现状（本工作扫描结果，供起点）：`Jpk ≥ 1.2e13 A/m²` 且 `dTpk ≈ 400 K`（峰值 T≈680 K < Tc=800 K，论文排除了 HAMR 情形）时，~50 ps 内平均 mz 过零、最终 mz≈−0.96；论文模型预测最快 16 ps。**要精确复刻图 3 需从 SI 取参数或自行拟合 Jpk/dTpk/tauC。**
 
+### 1.11 64×64 宏旋脚本的“6 ps”实为 ~28 ps（自适应步长再次踩坑）
+- 现象：`kimi\runs\2026-09-15_switch_Jp6e12_*` 在 Jp=6e12 就翻转，看似复现论文上限；但能量核算得 ∫J²dt = 7.76e14 → **189 pJ**（名义应 ~40 pJ）。
+- 原因：该脚本（上一轮重写版）用循环计数驱动脉冲、未固定步长；默认 RK45 在近平衡宏自旋上内部 dt≈1 ps，`run(0.2 ps)` 实际推进 1 ps → 脉冲在真实时间轴上被拉长到 **FWHM 27.6 ps**，积分增大 4.8 倍。
+- 解决：新增 `macrospin_switch.mx3`：脉冲写成内置时间 t 的函数，`SetSolver(4); FixDt=5e-14`，温度 ODE 用实测 Δt 积分。修正后实测 FWHM=5.85 ps、∫J²dt=1.63e14（39.7 pJ，与论文 40 pJ 口径一致），**Jp=6e12 不再翻转**。
+- 结论：`kimi\runs` 中两条“参考运行”应视为 **~28 ps 脉冲** 的结果，不能当作 6 ps 结论引用。
+
+### 1.12 `Pol=0` 会被断言拦截（做 θ=0 测试时）
+- 现象：设 `Pol=0` + J≠0 时仿真直接中止。
+- 原因：mumax3 源码 `AddSTTorque` 在 J≠0 时先执行 `AssertMsg(!Pol.isZero(), ...)`，早于 `DisableSlonczewskiTorque` 判断。
+- 解决：用 `Pol=1e-4`（等效零 SOT）+ `EpsilonPrime=0` 做“仅热各向异性力矩”测试。
+
 ---
 
 ## 2. 运行与数据整理
@@ -213,6 +226,36 @@ resource\simulations\mumax3_sot\runs\
 
 - **翻转机制**：检查 OVF 快照（`m000003.ovf`，75 ps），整个 5×4 µm 区域 mz 同步过零（均匀灰），即**近相干翻转**，无可见畴壁/成核——与论文"两者皆有可能、该样品接近相干"的讨论一致。当前为均匀 Ku1 模型，后续可加晶粒各向异性涨落（`ext_makegrains` + 逐 region `Ku1.SetRegion`）研究成核路径。
 
-## 4. 旧脚本说明
+- **图 4 六组合 + 反射（A 阶段）**：`runs/a_f4_*`（Hx∈{0,±160 mT} × I±，`echo=0.3, ted=24 ps`），合成图 `runs/fig4_full.png`。结果与论文 Fig. 4a 对称性完全一致：
+  - Hx=0 时 ±I 曲线完全重合，无振荡（单纯下拉 + 慢恢复）；
+  - 平行组 (Hx+,I+) 与 (Hx−,I−) 重合：下冲 −4.8% @15.8 ps 后进动；
+  - 反平行组 (Hx+,I−) 与 (Hx−,I+) 重合：先上冲 +1.3% 后反相进动；
+  - 反射在 T(t) 上表现为 24 ps 附近的次级峰，并给磁化一个次级踢动。
 
-`kimi\SOT_ps_switching.mx3`（现位于 `resource\simulations\kimi\`）已替换为修正版（与 `fig3_switching.mx3` 相同）。原脚本的三个致命问题：① 用 `Xi=0.2, Pol=1` 冒充 SOT（且 `J` 沿 x，Slonczewski 内核读到的是 0）；② 未设 `Msat`（默认 0）；③ `Ku1` 公式多乘 μ0。旧输出 `resource\simulations\kimi\SOT_ps_switching.out\` 对应错误结果，建议重跑或删除。
+- **B1 最快翻转（时间精确的 6 ps 脉冲，J_ref=Jp、dT∝J²）**：
+
+| case | Jp (A/m²) | dT_ref | Tmax | 平均 mz 过零 | 过零后 50 ps 恢复 |
+|------|-----------|--------|------|--------------|-------------------|
+| b1_Jp8_dT300 | 8e12 | 300 K | 583 K | 不翻转 | – |
+| b1_Jp8_dT450 | 8e12 | 450 K | 725 K | 58.6 ps | 92% |
+| b1_Jp10_dT300 | 1.0e13 | 300 K | 583 K | 88.8 ps（部分，末态 −0.11） | – |
+| b1_Jp12_dT300 | 1.2e13 | 300 K | 583 K | 65.5 ps | 77% |
+| b1_Jp12_dT450 | 1.2e13 | 450 K | 725 K | 50.1 ps | 93% |
+| b1_Jp16_dT300 | 1.6e13 | 300 K | 583 K | 51.7 ps | 89% |
+| b1_Jp16_dT450 | 1.6e13 | 450 K | 725 K | 43.7 ps | 95% |
+| **b1_Jp20_dT450** | **2.0e13** | **450 K** | **725 K** | **39.0 ps（最快）** | 97% |
+
+  → 本模型现有最快 ~39 ps（Jp=2e13、dT=450 K；对应能量 ~441 pJ），论文模型预测最快 16 ps；差距来自加热律/幂律参数（SI 未公开）。
+
+- **B2 θ≈0（仅热各向异性力矩）**：`Pol=1e-4, EpsilonPrime=0`、Jp=8e12。dT_ref=300 K 不翻转；dT_ref=450/600/800 K（Tmax 725/867/1056 K）分别在 **85.9/92.3/122.4 ps** 翻转 → 定性复现 SI Fig. 5（θ=0 也能翻转），但需要更强加热且更慢。
+
+- **B3 Ku(T) 开关**：`KuExp=3`（Ku∝Ms³）时 Jp=1e13 部分翻转、1.2e13 完全翻转；`KuExp=0`（Ku 不随温度变）时到 Jp=1.4e13 仍不翻转 → 热各向异性力矩是模型中的必要项；阈值能量比 ≥(1.4/1.0)²≈2，与论文"降低 2 倍"定性一致。
+
+- **F 能量核算（`energy_check.py`，ρ=81 μΩ·cm，V=5×4 µm²×15 nm）**：Jp=6e12 → **39.7 pJ**（与论文 40 pJ 口径一致）；能翻转的案例能量 70.6 pJ（8e12/450 K）、158.9 pJ（1.2e13/450 K）、441 pJ（2e13/450 K，最快 39 ps），均超出论文 <50 pJ 预算。要落回 50 pJ 内，须让模型在 ~6e12 就翻转（依赖 SI 的加热参数或更强的热各向异性协助）。
+
+## 4. 脚本状态说明
+
+- `macrospin_switch.mx3`（**新增规范模板**）：64×64 快速版，时间精确（实测 FWHM=5.85 ps@6 ps 档），带 `Jp / dT_ref / J_ref / tau_cool / Heating / KuExp / Pol / EpsilonPrime / I_sign / InitMz / Hx_mT / RunDynamics` 旋钮；配合 `run_case.py` 批量运行，`summary.csv` 自动记录 `t_cross_ps`（过零时刻）与 `recov_50ps`（过零后 50 ps 恢复率）。
+- `fig3_switching.mx3` / `fig4_dynamics.mx3`：5×4 µm 全器件与宏自旋动力学脚本，时间精确，继续作主力。
+- `kimi/SOT_ps_switching.mx3` 与 `kimi/runs/*`：上一轮版本，存在 1.11 的步长问题（“6 ps”实为 ~28 ps FWHM），**保留作历史参考，结论需按此修正**（其 `sweep_summary.csv` 中 Jp=6e12 的“翻转”不能对标 6 ps 实验）。
+- `SOT_ps_switching_v1_old.mx3`：最早的 `Xi=0.2, Pol=1` 错误版本，勿用。
