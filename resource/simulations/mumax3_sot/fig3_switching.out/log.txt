@@ -1,0 +1,102 @@
+//mumax 3.12 [windows_amd64 go1.26.0(gc) CUDA-12.9]
+//commit hash: 6e5c98bb
+//CPU info: Unknown, Error: exec: "wmic": executable file not found in %PATH%
+//GPU info: NVIDIA GeForce RTX 5060 Laptop GPU(8150MB), CUDA Driver 13.2, cc=12.0, using cc=120 PTX
+//OS  info: Windows OS, Hostname: never-die-cold
+//Timestamp: 2026-09-15 18:49:09
+//(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium
+//This is free software without any warranty. See license.txt
+//********************************************************************//
+//  If you use mumax in any work or publication,                      //
+//  we kindly ask you to cite the references in references.bib        //
+//********************************************************************//
+//output directory: fig3_switching.out/
+Nx := 500
+Ny := 400
+SetGridSize(Nx, Ny, 1)
+SetCellSize(5e-6/Nx, 4e-6/Ny, 1e-9)
+// WARNING: cell size was set to a high aspect ratio.
+//          Calculation of demag kernel may take longer than usual.
+//          Note that this can exacerbate discretization anisotropy.
+Ms0 := 1.3e6
+Msat = Ms0
+Aex = 3e-11
+alpha = 0.1
+Ha0 := 1.0
+Ku0 := 0.5*Ms0*Ha0 + 0.5*mu0*Ms0*Ms0
+Ku1 = Ku0
+AnisU = vector(0, 0, 1)
+DisableZhangLiTorque = true
+Pol = 0.20
+EpsilonPrime = 0.05
+Lambda = 1
+FreeLayerThickness = 1e-9
+FixedLayer = vector(0, -1, 0)
+J = vector(0, 0, 0)
+Hx := 160e-3
+Isign := 1.0
+B_ext = vector(Hx, 0, 0)
+Jpk := 1.2e13
+tp := 6.0e-12
+t0 := 5e-12
+dTpk := 400.0
+tauC := 100e-12
+Troom := 300.0
+Tc := 800.0
+echo := 0.0
+ted := 24e-12
+ln2x4 := 2.772588722239781
+SetSolver(4)
+FixDt = 5e-14
+Tcur := Troom
+Jcur := 0.0
+Ms_cur := Ms0
+TableAddVar(Tcur, "T", "K")
+TableAddVar(Jcur, "J", "A/m^2")
+TableAddVar(Ms_cur, "Ms", "A/m")
+TableAutoSave(0.5e-12)
+OutputFormat = OVF2_BINARY
+AutoSave(m, 25e-12)
+m = Uniform(0, 0, 1)
+relax()
+saveas(m, "m_initial")
+print("relaxed m = ", m.average())
+//relaxed m =  [0.15918396484375 9.66247171163559e-14 0.98724734375]
+J = vector(0, 0, Isign*Jpk*(exp(-ln2x4*pow((t-t0)/tp, 2))+echo*exp(-ln2x4*pow((t-t0-ted)/tp, 2))))
+tmax := 400e-12
+stp := 0.25e-12
+niter := 1600
+tprev := 0.0
+for i := 0; i < niter; i++ {
+	tb := t
+	Jcur = Isign * Jpk * (exp(-ln2x4*pow((tb-t0)/tp, 2)) + echo*exp(-ln2x4*pow((tb-t0-ted)/tp, 2)))
+	dtr := tb - tprev
+	gg := Jcur / (Isign * Jpk)
+	heat := dTpk * gg * gg / (0.75 * tp)
+	Tcur = (Tcur + heat*dtr + Troom*dtr/tauC) / (1 + dtr/tauC)
+	frac := (Tc - Tcur) / (Tc - Troom)
+	frac = 0.5 * (frac + abs(frac))
+	Ms_cur = Ms0 * pow(frac, 0.5)
+	Msat = Ms_cur
+	Ku1 = Ku0 * frac
+	tprev = tb
+	run(stp)
+}
+J = vector(0, 0, 0)
+Jcur = 0.0
+tableSave()
+saveas(m, "m_final")
+mzavg := m.average().Z()
+print("final mz = ", mzavg)
+//final mz =  -0.955858046875
+if mzavg < -0.5 {
+	print("result: switched (+Mz -> -Mz)")
+} else {
+	print("result: NOT switched (raise Jpk / dTpk, or check Hx and Isign)")
+}
+//result: switched (+Mz -> -Mz)
+//********************************************************************//
+//Please cite the following references, relevant for your simulation. //
+//See bibtex file in output folder for justification.                 //
+//********************************************************************//
+//   * Vansteenkiste et al., AIP Adv. 4, 107133 (2014).
