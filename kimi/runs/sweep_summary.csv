@@ -1,0 +1,8 @@
+case,type,Jp_Apm2,Hx_mT,I_sign,InitMz,Heating,Tmax_K,mz_min,mz_max,mz_final,outcome
+switch_ref,switch,6e12,160,1,1,1,583.3,-0.995,1.000,-0.9877,flipped_up_to_down
+switch_noheat,switch,6e12,160,1,1,0,300.0,0.812,1.000,0.9883,no_switch
+switch_Hx0,switch,6e12,0,1,1,1,583.3,0.650,1.000,1.000,no_switch
+switch_Iminus,switch,6e12,160,-1,1,1,583.3,0.494,1.000,0.9880,no_switch
+switch_initdown,switch,6e12,160,1,-1,1,583.3,-1.000,-0.494,-0.9880,stays_down
+dynamics_ref,dynamics,1e12,160,1,1,1,308.0,0.9758,1.000,0.9879,no_switch
+dynamics_initdown,dynamics,1e12,160,1,-1,1,308.0,-1.000,-0.9871,-0.9879,no_switch
