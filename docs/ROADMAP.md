@@ -15,7 +15,7 @@
 - [x] 结果一致性修正（反平行组无正上冲、t=0 伪影、弛豫基准）
 - [x] GitHub About：description + 9 个 topics
 - [x] **SI 参数复刻（2026-09-16）**：三个 .mx3 模板改为 SI Note 3/Table S1 参数与
-      温度律；加热改为 SI 热扩散 0D 等效通道（`heat_model.py`，6e12→+50.4 K、τ=245 ps、
+      温度律；加热改为 SI 热扩散 0D 等效通道（`heat_model.py`，6×10¹²→+50.4 K、τ=245 ps、
       FD 偏差 5.1%）；`run_case.py` 加 `model` 列；纯 SOT/加热阈值、机制分解
       （ScaleKz/ScaleMs/θ≈0/Hx=0/噪声）、脉宽窗口、全器件四象限与器件阈值、
       定稿图全量刷新；旧结果标 `model=legacy`、旧图备份 `runs/legacy/`；
@@ -67,21 +67,21 @@
   - 对标论文 >91% 翻转概率与成核图像
   - 验收：`P_sw(Jp)` 曲线 + 与论文对比图
 - [x] **P2（P1, M）热模型标定与敏感性**（2026-09-16 完成）
-  - 已按 SI Eq. S4–S5 实现：C=2.6e6、Λ=9 W/mK、G=170 MW/m²K、q=ρJ²；
+  - 已按 SI Eq. S4–S5 实现：C=2.6×10⁶、Λ=9 W/mK、G=170 MW/m²K、q=ρJ²；
     `heat_model.py` 1D FD 标定，.mx3 内 0D 通道偏差 5.1%（`runs/heat_model.png`）
-  - 剩余敏感性（移入 P8）：G_int（100 vs 170 MW/m²K，glass/sapphire）、
+  - 剩余敏感性（移入 P8）：G<sub>int</sub>（100 vs 170 MW/m²K，glass/sapphire）、
     C/Λ 不确定度对 Tmax 与阈值的影响
 - [ ] **P3（P1, M）收敛性与敏感性**
-  - 网格 5 nm vs 2.5 nm、`Aex`（SI 未给，现取 3e-11）、`alpha`（宏自旋下已扫 0.05–0.30，
-    阈值不敏感；全器件未扫）、宏自旋 vs 全器件；FixDt 5e-14 vs 1e-14 高温收敛性
+  - 网格 5 nm vs 2.5 nm、`Aex`（SI 未给，现取 3×10⁻¹¹）、`alpha`（宏自旋下已扫 0.05–0.30，
+    阈值不敏感；全器件未扫）、宏自旋 vs 全器件；FixDt 5×10⁻¹⁴ vs 1×10⁻¹⁴ 高温收敛性
   - 验收：对照表 + 结论不变的说明
 - [ ] **P4（P1, M）脉宽扫描：速度–能量权衡**
-  - 已有 θ=0.2/无加热 @10e12 的窗口（12 ps 不翻、15 ps 起翻）；待补加热下
+  - 已有 θ=0.2/无加热 @10×10¹² 的窗口（12 ps 不翻、15 ps 起翻）；待补加热下
     6→30 ps 扫描与延迟/能量曲线，对照论文 Fig. 4d 与 SI Fig. 3
   - 验收：`runs/` 新定稿图 + README/RESULTS 更新
 - [x] **P5（P2, S）SOT 等效性推导文档**（2026-09-16，并入 `docs/si_replica.md`）
-  - 已给出 Slonczewski 内核（ε=Pol/2、β=ħ/e）与 SI 的 θ_DL·C_s 的数值换算
-    （有效因子 ≈Pol/(1+α²)=θ_DL），含 DL 速率数值对照
+  - 已给出 Slonczewski 内核（ε=Pol/2、β=ħ/e）与 SI 的 θ<sub>DL</sub>·C<sub>s</sub> 的数值换算
+    （有效因子 ≈Pol/(1+α²)=θ<sub>DL</sub>），含 DL 速率数值对照
 - [ ] **P6（P2, L）更真实物理（可选）**
   - Oersted 场、DMI、传输线反射系数标定（SI Fig. 4a/b 的 echo 序列）；远期给
     mumax3 打补丁实现原生 SOT

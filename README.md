@@ -18,17 +18,17 @@ A [mumax3](https://mumax.github.io/) replica of:
 
 **Status (2026-09-16):** the material and thermal model now follows the paper's
 Supplementary Information item by item (SI Note 3 + Table S1, see
-[`docs/si_replica.md`](docs/si_replica.md)): Ms(300 K)=1.0e6 A/m, B_K=0.8 T,
+[`docs/si_replica.md`](docs/si_replica.md)): Ms(300 K)=1.0×10⁶ A/m, B<sub>K</sub>=0.8 T,
 alpha=0.23, Ms(T)=Ms(0)[1−(T/Tc)^1.7], Kz(T)∝Ms³, and heating as the 0D equivalent
-channel of the SI heat-diffusion model (6e12 / 6 ps → peak +50.4 K, τ=245 ps).
-The older runs (guessed parameters, free dT_ref knob) are kept as `model=legacy`
+channel of the SI heat-diffusion model (6×10¹² / 6 ps → peak +50.4 K, τ=245 ps).
+The older runs (guessed parameters, free dT<sub>ref</sub> knob) are kept as `model=legacy`
 in `runs/summary.csv` and `runs/legacy/`.
 
 ## Results at a glance
 
 | ![](simulations/mumax3_sot/runs/heat_model.png) | ![](simulations/mumax3_sot/runs/phase_map.png) |
 |---|---|
-| **Thermal model**: SI 1D FD vs the 0D .mx3 channel (`heat_model.py`) | **Threshold map**: mz_final vs Jp, 4 series (`plot_phase.py`) |
+| **Thermal model**: SI 1D FD vs the 0D .mx3 channel (`heat_model.py`) | **Threshold map**: mz<sub>final</sub> vs Jp, 4 series (`plot_phase.py`) |
 
 | ![](simulations/mumax3_sot/runs/mechanism_compare.png) | ![](simulations/mumax3_sot/runs/fig4_full.png) |
 |---|---|
@@ -40,22 +40,22 @@ in `runs/summary.csv` and `runs/legacy/`.
 
 ## 1. Key findings (SI-parameter model)
 
-* **Pure SOT switches without Joule heating**: threshold 20e12 at θ_DL=0.2
-  (~13.5e12 at θ_DL=0.3); with the SI heat channel it drops to 10e12 / ~8.5e12 →
+* **Pure SOT switches without Joule heating**: threshold 20×10¹² at θ<sub>DL</sub>=0.2
+  (~13.5×10¹² at θ<sub>DL</sub>=0.3); with the SI heat channel it drops to 10×10¹² / ~8.5×10¹² →
   **heating lowers the threshold current by ~2× (energy by ~2.3–4×)**, matching the
-  ratio in the paper's SI Fig. 3/4 (pure LLG 9e12 → with heating 6e12, ~2× energy).
+  ratio in the paper's SI Fig. 3/4 (pure LLG 9×10¹² → with heating 6×10¹², ~2× energy).
 * **Polarity rule** `sign(mz_final) = −sign(Hx·I)` (full-device four quadrants);
   `Hx=0` never switches (symmetry breaking required).
-* **Mechanism decomposition**: Kz(T) frozen → no switching up to 14e12 (necessary
+* **Mechanism decomposition**: Kz(T) frozen → no switching up to 14×10¹² (necessary
   channel); Ms(T) frozen alone → near-switching; θ≈0 (thermal-anisotropy torque
-  only) → switches from 12e12, slower (SI Fig. 5 behaviour).
-* **Pulse-width window** at 10e12 (heating off): no switching ≤12 ps, switching
+  only) → switches from 12×10¹², slower (SI Fig. 5 behaviour).
+* **Pulse-width window** at 10×10¹² (heating off): no switching ≤12 ps, switching
   from 15 ps → half-precession-period condition reproduced.
-* **Energy**: model threshold (10e12, θ=0.2) → 110 pJ, above the paper's <50 pJ
-  budget scale (6e12); absolute thresholds are ~1.5× above the SI values, most
+* **Energy**: model threshold (10×10¹², θ=0.2) → 110 pJ, above the paper's <50 pJ
+  budget scale (6×10¹²); absolute thresholds are ~1.5× above the SI values, most
   likely because the SI never specifies the pulse waveform/reflections.
-* **Caveats**: Jp≳1.9e13 drives the model through Tc (HAMR-like, excluded by the
-  paper's experiment); mumax3's Langevin noise has a fixed seed → no P_sw statistics.
+* **Caveats**: Jp≳1.9×10¹³ drives the model through Tc (HAMR-like, excluded by the
+  paper's experiment); mumax3's Langevin noise has a fixed seed → no P<sub>sw</sub> statistics.
 
 Full quantitative record: [`docs/RESULTS.md`](docs/RESULTS.md) (§0 = SI version,
 §1–8 = legacy).
@@ -105,14 +105,14 @@ Parameters live in the user block at the top of `macrospin_switch.mx3`:
 | variable | meaning |
 |---|---|
 | `Jp` / `tp_ps` | peak current density / pulse FWHM (ps) |
-| `ThetaDL` | θ_DL (0.20 main-text fit; 0.30 = SI Fig. 3–5 value) |
+| `ThetaDL` | θ<sub>DL</sub> (0.20 main-text fit; 0.30 = SI Fig. 3–5 value) |
 | `Hx_mT` / `I_sign` / `InitMz` | in-plane bias field / current polarity / initial state |
 | `Heating` | 1 = SI heat channel (Ms/Kz follow T); 0 = frozen 300 K (pure LLG) |
 | `ScaleMs` / `ScaleKz` | freeze Ms(T) / Kz(T) independently (mechanism decomposition) |
 | `Noise` | 1 = Langevin noise at T(t) (fixed seed) |
 | `t_free` | free evolution after the pulse |
 
-Thermal constants (ρ, C, Λ, G, d_stack) and the Ms(T)/Kz(T) laws are hard-coded in
+Thermal constants (ρ, C, Λ, G, d<sub>stack</sub>) and the Ms(T)/Kz(T) laws are hard-coded in
 the scripts; see `docs/si_replica.md`. `heat_model.py` re-derives them and plots.
 
 ## 4. Two key conventions (pitfalls, see notes/error.md)
@@ -139,7 +139,7 @@ the scripts; see `docs/si_replica.md`. `heat_model.py` re-derives them and plots
 
 **Polarity calibration** (full device, matches paper Fig. 3):
 
-| Hx | I_sign | final state |
+| Hx | I<sub>sign</sub> | final state |
 |---|---|---|
 | +160 mT | +1 | −Mz |
 | +160 mT | −1 | +Mz |
@@ -151,34 +151,34 @@ i.e. `sign(mz_final) = -sign(Hx·I)` (all batch runs start from +Mz; the paper's
 
 ## 5. Verified results (2026-09-16, SI parameters)
 
-**Thresholds** (macrospin 64×64, 6 ps sech², Hx=160 mT; Tmax=300+50.4(Jp/6e12)² K):
+**Thresholds** (macrospin 64×64, 6 ps sech², Hx=160 mT; Tmax=300+50.4(Jp/6×10¹²)² K):
 
 | series | threshold Jc | note |
 |---|---|---|
-| θ=0.2, SI heating | (9,10]e12 | Tmax (411,438] K; switches from 10e12 (68.3 ps) |
-| θ=0.2, heating off | 20e12 (19e12 partial, −0.47) | **pure SOT switches** |
-| θ=0.3, SI heating | (8,9]e12 | |
-| θ=0.3, heating off | (12,14]e12 (13e12 partial) | |
+| θ=0.2, SI heating | (9, 10]×10¹² | Tmax (411,438] K; switches from 10×10¹² (68.3 ps) |
+| θ=0.2, heating off | 20×10¹² (19×10¹² partial, −0.47) | **pure SOT switches** |
+| θ=0.3, SI heating | (8, 9]×10¹² | |
+| θ=0.3, heating off | (12, 14]×10¹² (13×10¹² partial) | |
 
-With heating, 15–16e12 shows a non-monotonic no-switching window (precessional
-phase effect); switching resumes at 18/20e12.
+With heating, 15–16×10¹² shows a non-monotonic no-switching window (precessional
+phase effect); switching resumes at 18/20×10¹².
 
 **Mechanism decomposition** (SI heating, θ=0.2):
 
 | control | result |
 |---|---|
-| `ScaleKz=0` (Kz frozen) | no switching at 10/12/14e12 → Kz(T) collapse is necessary |
-| `ScaleMs=0` (Kz collapse only) | 10e12 +0.45, 12e12 −0.46 (near switching) |
-| θ≈0 (thermal-anisotropy torque only) | switches at 12e12 (122.5 ps), 14e12 (80.2 ps) — SI Fig. 5 |
+| `ScaleKz=0` (Kz frozen) | no switching at 10/12/14×10¹² → Kz(T) collapse is necessary |
+| `ScaleMs=0` (Kz collapse only) | 10×10¹² +0.45, 12×10¹² −0.46 (near switching) |
+| θ≈0 (thermal-anisotropy torque only) | switches at 12×10¹² (122.5 ps), 14×10¹² (80.2 ps) — SI Fig. 5 |
 | `Hx_mT=0` | never switches |
 
-**Full device** (5×4 µm, Jpk=1.2e13, Tmax=497 K): four-quadrant polarity ✓,
-threshold (9,10]e12 consistent with macrospin, `Hx=0` (12e12) does not switch.
+**Full device** (5×4 µm, Jpk=1.2×10¹³, Tmax=497 K): four-quadrant polarity ✓,
+threshold (9, 10]×10¹² consistent with macrospin, `Hx=0` (12×10¹²) does not switch.
 
 **Fig. 4 dynamics**: parallel dip −5.9% @29 ps, antiparallel −1.9%, no oscillation
 at Hx=0, period ≈44 ps, peak ΔT +13.9 K (heat model predicts 13.8 K).
 
-**Energy**: 6e12 → 39.7 pJ (paper scale); 10e12 → 110 pJ; 20e12 → 441 pJ.
+**Energy**: 6×10¹² → 39.7 pJ (paper scale); 10×10¹² → 110 pJ; 20×10¹² → 441 pJ.
 
 ## 6. Output and post-processing
 
@@ -200,13 +200,13 @@ One-command figure rebuild: `heat_model.py` → `plot_phase.py` → `plot_fig4.p
 
 ## 7. Simulation roadmap
 
-1. ~~Self-checks~~ (done): relax mz=cos(atan(Hx/B_K))=0.981; Hx=0 never switches;
-   pure-LLG threshold 20e12.
+1. ~~Self-checks~~ (done): relax mz=cos(atan(Hx/B<sub>K</sub>))=0.981; Hx=0 never switches;
+   pure-LLG threshold 20×10¹².
 2. ~~Time-resolved dynamics (Fig. 4a,b)~~ (done, SI parameters): `runs/fig4_full.png`.
-3. ~~Single-pulse switching (Fig. 3)~~ (done): four quadrants + device threshold (9,10]e12.
+3. ~~Single-pulse switching (Fig. 3)~~ (done): four quadrants + device threshold (9, 10]×10¹².
 4. ~~Thermal-model calibration~~ (done): `heat_model.py` per SI Eq. S4–S5; 0D channel error 5.1%.
 5. **Micromagnetics & probability (TODO)**: Voronoi grains + seed control
-   (mumax3 Langevin is fixed-seed) → P_sw(Jp), paper's >91% switching probability.
+   (mumax3 Langevin is fixed-seed) → P<sub>sw</sub>(Jp), paper's >91% switching probability.
 6. **Energy**: `energy_check.py runs/<tag>` integrates the actual J(t).
 
 See [`docs/ROADMAP.md`](docs/ROADMAP.md).
@@ -216,7 +216,7 @@ See [`docs/ROADMAP.md`](docs/ROADMAP.md).
 * Pulse waveform assumed sech² (SI does not specify) → absolute thresholds ~1.5×
   above the SI values (ratios match);
 * uniform-anisotropy model, no nucleation/domain walls, no switching statistics;
-* Jp≳1.9e13 exceeds Tc (HAMR-like, excluded experimentally in the paper);
+* Jp≳1.9×10¹³ exceeds Tc (HAMR-like, excluded experimentally in the paper);
 * transmission-line reflections (echo) approximated by a delayed pulse;
 * the paper's quasi-static Jc(Hx) (100 µs pulses) is thermally activated and not
   reproducible by long-time LLG;
