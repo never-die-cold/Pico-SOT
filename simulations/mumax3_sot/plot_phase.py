@@ -9,6 +9,12 @@ collapses into 1D threshold curves.  This script plots:
     phase_traces.png mz(t) and T(t) around the theta=0.2 heated boundary
     phase_speed.png  crossing time vs Jp (switched cases)
 
+For each (theta, heating, Jp) the `si_*_lr<ps>` re-run (long free relaxation,
+e.g. 1500 ps, T back to ~300 K) overrides the base 0.4 ns snapshot.  Points
+whose m_final.ovf is not a uniform state (|average m| < 0.9, i.e. the 64x64
+pseudo-macrospin broke into domains near the boundary) are excluded from the
+lines and drawn as grey crosses.
+
 B2/B3-style controls (theta~0, Kz frozen) and Hx=0 symmetry checks are
 excluded; they live in mechanism_compare.png.
 
@@ -37,25 +43,54 @@ SERIES = {  # tag pattern -> (label, color, linestyle)
 }
 
 
+def ovf_uniformity(runs_root, tag):
+    """|average m| from m_final.ovf: 1 for a uniform state, <<1 for multidomain."""
+    path = os.path.join(runs_root, tag, "out", "m_final.ovf")
+    if not os.path.isfile(path):
+        return 1.0
+    raw = open(path, "rb").read()
+    i = raw.find(b"# Begin: Data Binary 4")
+    j = raw.find(b"\n", i) + 1
+    head = raw[:i].decode("ascii", "replace")
+    nx = int(re.search(r"xnodes:\s*(\d+)", head).group(1))
+    ny = int(re.search(r"ynodes:\s*(\d+)", head).group(1))
+    nz = int(re.search(r"znodes:\s*(\d+)", head).group(1))
+    vd = int(re.search(r"valuedim:\s*(\d+)", head).group(1))
+    data = np.frombuffer(raw[j + 4:], dtype="<f4")
+    nc = nx * ny * nz
+    v = data[: nc * vd].reshape(nc, vd)
+    return float(np.linalg.norm(v[:, :3].mean(axis=0)))
+
+
 def load_points(summary):
-    pts = []
-    pat = re.compile(r"^si_(h|noh)_t(\d+)_Jp(\d+)$")
+    """One point per (theta, heat, Jp); *_lr<ps> re-runs win over the base case."""
+    runs_root = os.path.dirname(os.path.abspath(summary))
+    pat = re.compile(r"^si_(h|noh)_t(\d+)_Jp(\d+)(?:_lr(\d+))?$")
+    best = {}
     with open(summary, newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
             if row.get("model") != "si":
                 continue
-            m = pat.match(row["tag"])
+            m = pat.match(row.get("tag", ""))
             if not m:
                 continue
-            pts.append({
+            lr = int(m.group(4) or 0)
+            key = ("0." + m.group(2)[0], 1 if m.group(1) == "h" else 0,  # 20 -> 0.2
+                   float(row["Jp"]))
+            if key in best and best[key]["lr"] > lr:
+                continue
+            best[key] = {
                 "tag": row["tag"],
-                "heat": 1 if m.group(1) == "h" else 0,
-                "theta": "0." + m.group(2)[0],  # 20 -> 0.2, 30 -> 0.3
+                "heat": key[1],
+                "theta": key[0],
                 "Jp": float(row["Jp"]),
                 "Tmax": float(row["Tmax_K"]),
                 "mz": float(row["mz_final"]),
                 "t_cross": float(row["t_cross_ps"]) if row["t_cross_ps"] else np.nan,
-            })
+                "lr": lr,
+                "uni": ovf_uniformity(runs_root, row["tag"]),
+            }
+    pts = sorted(best.values(), key=lambda p: (p["theta"], p["heat"], p["Jp"]))
     assert pts, "no si_ threshold points found"
     return pts
 
@@ -83,22 +118,30 @@ def fig_map(pts, out):
     # Tmax scale as a secondary y-axis for the heated series
     for key, (label, color, ls) in SERIES.items():
         th, heat = key
-        g = sorted([p for p in pts if p["theta"] == th and p["heat"] == int(heat)],
-                   key=lambda p: p["Jp"])
+        g = sorted([p for p in pts if p["theta"] == th and p["heat"] == int(heat)
+                    and p["uni"] >= 0.9], key=lambda p: p["Jp"])
         if not g:
             continue
         x = [p["Jp"] / 1e12 for p in g]
         y = [p["mz"] for p in g]
         ax.plot(x, y, ls, color=color, lw=1.4, marker="o", ms=3.5,
                 label=label)
+    bad = [p for p in pts if p["uni"] < 0.9]
+    if bad:
+        ax.plot([p["Jp"] / 1e12 for p in bad], [p["mz"] for p in bad], "x",
+                color="0.35", ms=6, mew=1.4, ls="none",
+                label="multidomain (excluded)")
     ax.axhline(0, color="k", lw=0.6, alpha=0.5)
     ax.axhline(-0.5, color="k", ls="--", lw=0.7, alpha=0.5)
-    ax.text(6.1, -0.42, "switch criterion", fontsize=7, color="0.35")
+    ax.text(20.5, -0.42, "switch criterion", fontsize=7, color="0.35")
+    ax.text(0.985, 0.98, "$\\theta_{DL}$=0.2 series: $t_{free}$=1.5 ns$^{*}$\n"
+            "$^{*}$1.5 ns where available; else 0.4 ns snapshot",
+            transform=ax.transAxes, fontsize=6, color="0.4", ha="right", va="top")
     ax.set_xlabel(r"$J_p$ ($10^{12}$ A/m$^2$)")
     ax.set_ylabel("final $m_z$")
     ax.set_title("Switching threshold, 6 ps sech$^2$ pulse, Hx=160 mT\n"
                  "SI model: $T_{max}$ = 300 + 50.4 K ($J_p$/6e12)$^2$")
-    ax.legend(fontsize=7.5, loc="lower left")
+    ax.legend(fontsize=7, loc="lower left")
     style(ax)
     fig.savefig(out, dpi=200)
     print("saved:", out)
@@ -177,9 +220,11 @@ def main():
 
     pts = load_points(args.summary)
     for p in sorted(pts, key=lambda p: (p["theta"], p["heat"], p["Jp"])):
-        print("%-22s th=%s heat=%d  Jp=%.0fe12  Tmax=%4.0f K  mz=%+.4f  t_cross=%s"
+        print("%-28s th=%s heat=%d  Jp=%4.0fe12  Tmax=%4.0f K  mz=%+.4f  "
+              "t_cross=%-5s |avg|=%s"
               % (p["tag"], p["theta"], p["heat"], p["Jp"] / 1e12, p["Tmax"], p["mz"],
-                 "%.1f" % p["t_cross"] if p["t_cross"] == p["t_cross"] else "-"))
+                 "%.1f" % p["t_cross"] if p["t_cross"] == p["t_cross"] else "-",
+                 "%.3f%s" % (p["uni"], "" if p["uni"] >= 0.9 else " <- multidomain")))
 
     fig_map(pts, os.path.join(args.outdir, "phase_map.png"))
     fig_traces(["si_h_t20_Jp8", "si_h_t20_Jp11", "si_h_t20_Jp12", "si_h_t20_Jp15"],

@@ -20,19 +20,20 @@
 见 [`docs/si_replica.md`](docs/si_replica.md)）：Ms(300 K)=1.0×10⁶ A/m、B<sub>K</sub>=0.8 T、α=0.23、
 Ms(T)=Ms(0)[1−(T/Tc)^1.7]、Kz(T)∝Ms³、加热为 SI 热扩散方程的 0D 等效通道
 （6×10¹²/6 ps → 峰值 +50.4 K、τ=245 ps）。旧版（猜测参数 dT<sub>ref</sub> 旋钮）结果以
-`model=legacy` 保留在 `runs/summary.csv` 与 `runs/legacy/`。
+`model=legacy` 保留在 `runs/summary.csv` 与 `runs/legacy/`（仅本地：运行数据不入仓库，
+见 §6）。
 
 ## 结果速览
 
-| ![](simulations/mumax3_sot/runs/heat_model.png) | ![](simulations/mumax3_sot/runs/phase_map.png) |
+| ![](docs/figures/heat_model.png) | ![](docs/figures/phase_map.png) |
 |---|---|
 | **热模型标定**：SI 1D 热扩散 FD vs .mx3 的 0D 通道（`heat_model.py`） | **阈值图**：mz<sub>final</sub> vs Jp（4 系列，`plot_phase.py`） |
 
-| ![](simulations/mumax3_sot/runs/mechanism_compare.png) | ![](simulations/mumax3_sot/runs/fig4_full.png) |
+| ![](docs/figures/mechanism_compare.png) | ![](docs/figures/fig4_full.png) |
 |---|---|
 | **机制分解**：加热开/关、θ≈0、Kz(T)/Ms(T) 冻结（`plot_mechanism.py`） | **Fig. 4 动力学**：6 种 Hx/I 组合的 ΔMz(t)（`plot_fig4.py`） |
 
-| ![](simulations/mumax3_sot/runs/q_quadrants.png) | ![](simulations/mumax3_sot/runs/energy_bars.png) |
+| ![](docs/figures/q_quadrants.png) | ![](docs/figures/energy_bars.png) |
 |---|---|
 | **四象限**：5×4 µm 器件末态均匀单畴（`plot_quadrants.py`） | **能耗**：∫J²dt·ρV（`plot_energy.py`） |
 
@@ -73,11 +74,12 @@ simulations/mumax3_sot/                # 主工作目录
    ├─ macrospin_switch.mx3             # 64×64 快速模板（SI 参数 + 热模型 + 旋钮）
    ├─ fig3_switching.mx3               # 5×4 µm 全器件单脉冲翻转
    ├─ fig4_dynamics.mx3                # Fig.4 动力学（PBC 无限薄膜 + echo）
-   ├─ heat_model.py                    # SI 1D 热扩散 FD 标定（→ runs/heat_model.png）
+   ├─ heat_model.py                    # SI 1D 热扩散 FD 标定（→ docs/figures/heat_model.png）
    ├─ run_case.py                      # 批量运行+归档（--model si/legacy）
    ├─ plot_phase.py / plot_fig4.py / plot_mechanism.py / plot_quadrants.py
    ├─ plot_table.py / plot_energy.py / energy_check.py
-   └─ runs/                            # summary.csv + 定稿图 + 各 case（si_ 前缀；legacy 另存）
+   └─ runs/                            # 仅本地（git 忽略）：summary.csv + 各 case
+docs/figures/                          # 定稿图（上方嵌入用）
 ```
 
 ## 3. 快速开始
@@ -147,11 +149,14 @@ python simulations/mumax3_sot/run_case.py `
 | 系列 | 阈值 Jc | 说明 |
 |---|---|---|
 | θ=0.2，SI 加热 | (9, 10]×10¹² | Tmax (411,438] K；10×10¹² 起翻（68.3 ps） |
-| θ=0.2，无加热 | 20×10¹²（19×10¹² 部分 −0.47） | **纯 SOT 可翻** |
+| θ=0.2，无加热 | 20×10¹²（19×10¹² 变多畴，已剔除） | **纯 SOT 可翻** |
 | θ=0.3，SI 加热 | (8, 9]×10¹² | |
-| θ=0.3，无加热 | (12, 14]×10¹²（13×10¹² 部分） | |
+| θ=0.3，无加热 | (12, 14]×10¹²（13×10¹² 变多畴，已剔除） | |
 
-加热后 15–16×10¹² 出现非单调"不翻窗口"（进动相位效应），18/20×10¹² 恢复翻转。
+加热后 **15–17×10¹²** 为单畴"不翻窗口"（相干进动回捕；θ=0.3 同为 14–17×10¹²，
+其中 14×10¹² 是多畴伪影），18×10¹² 恢复翻转并一直到 30×10¹²（1.5 ns 长弛豫复核，
+未再出现新窗口；27×10¹² 加热档为多畴伪影）。此结论取代早前"15–16×10¹²（mz=+0.96）"
+的表述。
 
 **机制分解**（SI 加热，θ=0.2）：
 
@@ -174,7 +179,8 @@ python simulations/mumax3_sot/run_case.py `
 
 每次运行输出 `out/table.txt`（列：`t, mx, my, mz, E_total, J, T`）、`out/m_initial.ovf`、
 `out/m_final.ovf`、`out/log.txt`；`run_case.py` 自动写 `runs/summary.csv`
-（含 `model=si/legacy`）。批量扫描示例：
+（含 `model=si/legacy`）。**`runs/` 已整体加入 `.gitignore`：运行数据只留本地，
+仓库仅保留代码、文档与定稿图（`docs/figures/`）。** 批量扫描示例：
 
 ```powershell
 foreach ($Jp in 6,8,10,12) {
@@ -186,12 +192,12 @@ foreach ($Jp in 6,8,10,12) {
 
 定稿图一键重建：`heat_model.py` → `plot_phase.py` → `plot_fig4.py` →
 `plot_mechanism.py` → `plot_quadrants.py` → `plot_energy.py`（在
-`simulations/mumax3_sot/` 下运行）。
+`simulations/mumax3_sot/` 下运行，再拷入 `docs/figures/`）。
 
 ## 7. 仿真路线
 
 1. ~~自检~~（已完成）：relax mz=cos(atan(Hx/B<sub>K</sub>))=0.981；`Hx=0` 不翻；加热关闭阈值 20×10¹²。
-2. ~~时域动力学（Fig.4a,b）~~（已完成，SI 参数）：见 `runs/fig4_full.png`。
+2. ~~时域动力学（Fig.4a,b）~~（已完成，SI 参数）：见 `docs/figures/fig4_full.png`。
 3. ~~单脉冲翻转（Fig.3）~~（已完成）：四象限 + 器件阈值 (9, 10]×10¹²。
 4. ~~热模型标定~~（已完成）：`heat_model.py` 按 SI Eq. S4–S5 标定，0D 通道误差 5.1%。
 5. **微磁与概率（待做）**：Voronoi 晶粒 + 随机种子改造（mumax3 Langevin 固定种子）
@@ -203,7 +209,9 @@ foreach ($Jp in 6,8,10,12) {
 ## 8. 已知局限
 
 * 脉冲波形为 sech² 约定（SI 未给）→ 绝对阈值比 SI 高 ~1.5×（比值已对上）；
-* 均匀 Ku 模型，无成核/畴壁与随机性统计（P<sub>sw</sub> 未做）；
+* 均匀 Ku 模型，无成核/畴壁与随机性统计（P<sub>sw</sub> 未做）；64×64 帧在近阈值/极强
+  电流下会长出条畴（|⟨m⟩|<0.9，胞元 5 nm 与 √(A/Kz)≈5 nm 同量级），此时平均 mz
+  不能当作单畴翻转结果，phase_map 中已剔除并标灰叉；
 * Jp≳1.9×10¹³ 时 Tmax>Tc（HAMR 型，论文实验排除），解读需谨慎；
 * 传输线反射（echo）以叠加延迟脉冲近似；
 * 论文的准静态 `Jc(Hx)`（100 µs 脉冲）依赖热激活，不适合直接长时间 LLG 复现；

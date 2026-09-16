@@ -53,7 +53,7 @@
 | `macrospin_switch.mx3` | 64×64，cell 5 nm（320×320 nm），Co 1 nm | sech²，`tp_ps=6`（dynamics 3.7） | Ms300=1×10⁶、BK300=0.8 T、α=0.23、θ=0.20、SI 热通道、`Noise/ScaleMs/ScaleKz` 旋钮、t<sub>free</sub>=400 ps | 阈值/机制扫描模板 |
 | `fig3_switching.mx3` | 500×400，cell 10×10×1 nm（5×4 µm 过流区） | 高斯 6 ps，t0=5 ps | Jpk=1.2×10¹³、echo=0；SI 材料与热通道 | 单脉冲翻转/四象限 |
 | `fig4_dynamics.mx3` | 64×64，cell 16 nm，PBC(16,16,0) 无限薄膜 | 高斯 3.7 ps，t0=5 ps | Jpk=4×10¹²、echo/ted 可调；SI 材料与热通道 | 时域 ΔMz(t) |
-| `heat_model.py` | 16 nm 叠层 1D FD | sech² | SI C/Λ/G/ρ | 热模型标定与 `runs/heat_model.png` |
+| `heat_model.py` | 16 nm 叠层 1D FD | sech² | SI C/Λ/G/ρ | 热模型标定与 `docs/figures/heat_model.png` |
 
 工具脚本：`run_case.py`（参数替换 + 归档 + `summary.csv` 带 `model` 列）、`plot_table.py`、`plot_phase.py`、`plot_fig4.py`、`plot_mechanism.py`、`plot_quadrants.py`、`energy_check.py`、`plot_energy.py`。
 
@@ -66,16 +66,19 @@
    | 系列 | 阈值 Jc（mz<sub>final</sub><−0.5） | 对应 Tmax | 备注 |
    |---|---|---|---|
    | θ=0.2，SI 加热 | (9, 10]×10¹² | (411,438] K | 10×10¹² 起翻，t<sub>cross</sub> 68.3 ps |
-   | θ=0.2，无加热 | 20×10¹²（19×10¹² 部分 −0.47） | 300 K | **纯 SOT 无加热可翻** |
+   | θ=0.2，无加热 | 20×10¹²（19×10¹² 变多畴，已剔除） | 300 K | **纯 SOT 无加热可翻** |
    | θ=0.3，SI 加热 | (8, 9]×10¹² | (388,411] K | |
-   | θ=0.3，无加热 | (12, 14]×10¹²（13×10¹² 部分 −0.10） | 300 K | |
+   | θ=0.3，无加热 | (12, 14]×10¹²（13×10¹² 变多畴，已剔除） | 300 K | |
 
    加热/无加热阈值比：θ=0.2 → 2.0（能量 4×）；θ=0.3 → ~1.5（能量 ~2.3×）。
    **与 SI Fig. 4 的 9×10¹²→6×10¹²（能量 ~2×）定量一致**；绝对值整体偏高 ~1.5×，
    归因于脉冲波形/反射口径（见 si_replica §4）。【已核实】
 
-4. **非单调窗口**：加热下 θ=0.2 在 15–16×10¹² 短暂回到不翻（mz<sub>final</sub> +0.96），
-   18/20×10¹² 又翻——大角度进动的相位窗口效应；θ=0.3 加热在 14×10¹² 部分（+0.20）。【已核实】
+4. **非单调窗口（2026-09-17 修正）**：加热下 θ=0.2 在 **15–17×10¹²** 为单畴不翻
+   （|⟨m⟩|=1.000，末态稳定 +0.981），θ=0.3 在 **14–17×10¹²**（14×10¹² 为多畴伪影）；
+   18×10¹² 恢复翻转。用 1.5 ns 自由弛豫复核（T 回 ~300 K），并把 θ=0.2 扫到 30×10¹²
+   （1e12 步长、加热开/关）：**未再出现第二个窗口**（27×10¹² 加热档为多畴伪影）。
+   早前"15–16×10¹²（mz=+0.96）"是未弛豫快照，已被本修正取代。【已核实】
 5. **脉宽窗口（θ=0.2，10×10¹²，无加热）**：6/8/10/12 ps 不翻；**15 ps 部分翻（−0.93）、20/30 ps 完全翻** → 半周期条件（FMR 半周期 ≈18–19 ps）成立，与论文"FMR 半周期 <20 ps"的说法一致。【已核实】
 6. **α 敏感性**：10×10¹² 无加热、α=0.05/0.10/0.30 均不翻（阈值对 α 不敏感，20×10¹² 附近才翻）。【已核实】
 7. **机制分解（SI 热通道，θ=0.2）**：
@@ -91,9 +94,9 @@
 
 ## 7. 输出与归档
 
-1. 每个 case：`runs/<tag>/<tag>.mx3`（实际运行脚本副本）+ `runs/<tag>/out/`（保留 `table.txt`、`log.txt`、`m_initial.ovf`、`m_final.ovf`）。【约定】
+1. 每个 case：`runs/<tag>/<tag>.mx3`（实际运行脚本副本）+ `runs/<tag>/out/`（保留 `table.txt`、`log.txt`、`m_initial.ovf`、`m_final.ovf`）。`runs/` **仅本地**（已在 `.gitignore`，运行数据不进仓库；仓库只含代码、文档与 `docs/figures/` 定稿图）。【约定】
 2. `summary.csv` 列含 `model`（`si`/`legacy`）；新 run 由 `run_case.py --model` 写入（默认 si）。`switched = InitMz·mz_final < −0.5`；`t_cross` 为首次过零（含"过零又弹回"的情况，判定以 mz<sub>final</sub> 为准）。【约定】
-3. 定稿图（SI 版）：`runs/heat_model.png`、`phase_map.png`、`phase_traces.png`、`phase_speed.png`、`fig4_full.png`、`mechanism_compare.png`、`q_quadrants.png`、`energy_bars.png`。旧版备份在 `runs/legacy/`。【约定】
+3. 定稿图（SI 版）：`docs/figures/`（heat_model、phase_map、phase_traces、phase_speed、fig4_full、mechanism_compare、q_quadrants、energy_bars 等）。旧版备份在本地 `runs/legacy/`（不入仓库）。【约定】
 4. OVF 后处理：`mumax3-convert -png out/m_final.ovf`（或 `-vtk` 给 ParaView）。【约定】
 
 ## 8. 已知局限与未决
@@ -103,7 +106,8 @@
 3. Jp≳1.9×10¹³ 时 Tmax>Tc、Ms 截断为 0，属 HAMR 型情形（论文实验排除），解读需谨慎。
 4. 论文准静态 Jc(Hx)（100 µs，热激活）不适合长时间 LLG 复现。
 5. 网格/材料敏感性（Aex=3×10⁻¹¹ 为典型值，SI 未给 A）未系统扫描（ROADMAP P3）。
-6. 【历史】legacy 结论（2026-09-15 版）：dT<sub>ref</sub> 旋钮加热下"6–10×10¹² 完全依赖焦耳热"、宏自旋最快 39 ps、阈值能量 39.7–441 pJ 等，均基于猜测参数（Ms=1.3×10⁶、Ha=1 T、α=0.15、dT∝J² 旋钮），已被 SI 参数版取代；旧 runs/图以 legacy 保留，勿与新结果混用。
+6. **多畴伪影**：64×64 帧（5 nm 胞元，√(A/Kz)≈5 nm 同量级）在近阈值/极强电流下会出现条畴，|⟨m⟩|≈0.28–0.58，此时平均 mz 不代表单畴翻转 → 判定标准是 `m_final.ovf` 的 |⟨m⟩|<0.9 即剔除（phase_map 灰叉）。已确认的多畴点：无加热 19e12（θ=0.2）、无加热 13e12（θ=0.3）、加热 14e12（θ=0.3）、加热 27e12（θ=0.2）。
+7. 【历史】legacy 结论（2026-09-15 版）：dT<sub>ref</sub> 旋钮加热下"6–10×10¹² 完全依赖焦耳热"、宏自旋最快 39 ps、阈值能量 39.7–441 pJ 等，均基于猜测参数（Ms=1.3×10⁶、Ha=1 T、α=0.15、dT∝J² 旋钮），已被 SI 参数版取代；旧 runs/图以 legacy 保留，勿与新结果混用。
 
 ## 9. 引用
 

@@ -25,6 +25,11 @@
 
 ## R. 发布与追溯
 
+- [x] **R0（2026-09-17）运行数据不再入库**
+  - `runs/`（summary.csv、table.txt、ovf、case 脚本）整体 git-ignore，仅本地保留；
+    定稿图移入 `docs/figures/` 并更新 README/RESULTS/FACTS 引用
+  - 遗留：如需把历史提交里的 run 数据也从 GitHub 彻底清除，需 `git filter-repo`
+    重写历史 + force push（会改变所有 commit hash，先与协作者确认）
 - [ ] **R1（P1, M）发布 v1.0.0**
   - 打 tag + Release notes（摘要已验证结果与已知局限）
   - 验收：GitHub Releases 出现 v1.0.0；README 徽章区可加 release 徽章
@@ -36,14 +41,14 @@
   - 涉及：`simulations/mumax3_sot/run_case.py`
   - 验收：新 run 的 CSV 行含以上字段；旧行留空不报错
 - [ ] **R4（P2, S）社交预览图**
-  - 上传 `simulations/mumax3_sot/runs/phase_map.png`（Settings → Social preview）
+  - 上传 `docs/figures/phase_map.png`（Settings → Social preview）
   - 验收：仓库链接卡片显示相图
 
 ## T. 可复现性与工具
 
 - [ ] **T1（P1, M）一键重建定稿图 `run_all.py`**
   - 从 `runs/summary.csv` 依次调用 `plot_phase` / `plot_fig4` / `plot_mechanism` / `plot_quadrants` 等
-  - 验收：删掉 `runs/*.png` 后一条命令恢复全部定稿图
+  - 验收：删掉 `runs/*.png` 后一条命令重建全部图，并拷入 `docs/figures/`（`runs/` 不入库）
 - [ ] **T2（P1, S）`run_case.py` 增强**
   - 跑前 `mumax3 -vet` 预检语法；stdout/stderr 落盘到 `runs/<tag>/`；加 `--dry-run`
   - 验收：失败的 case 保留日志现场；`--dry-run` 只写脚本不调用 mumax3
@@ -68,7 +73,7 @@
   - 验收：`P_sw(Jp)` 曲线 + 与论文对比图
 - [x] **P2（P1, M）热模型标定与敏感性**（2026-09-16 完成）
   - 已按 SI Eq. S4–S5 实现：C=2.6×10⁶、Λ=9 W/mK、G=170 MW/m²K、q=ρJ²；
-    `heat_model.py` 1D FD 标定，.mx3 内 0D 通道偏差 5.1%（`runs/heat_model.png`）
+    `heat_model.py` 1D FD 标定，.mx3 内 0D 通道偏差 5.1%（`docs/figures/heat_model.png`）
   - 剩余敏感性（移入 P8）：G<sub>int</sub>（100 vs 170 MW/m²K，glass/sapphire）、
     C/Λ 不确定度对 Tmax 与阈值的影响
 - [ ] **P3（P1, M）收敛性与敏感性**
@@ -78,7 +83,7 @@
 - [ ] **P4（P1, M）脉宽扫描：速度–能量权衡**
   - 已有 θ=0.2/无加热 @10×10¹² 的窗口（12 ps 不翻、15 ps 起翻）；待补加热下
     6→30 ps 扫描与延迟/能量曲线，对照论文 Fig. 4d 与 SI Fig. 3
-  - 验收：`runs/` 新定稿图 + README/RESULTS 更新
+  - 验收：`docs/figures/` 新定稿图 + README/RESULTS 更新
 - [x] **P5（P2, S）SOT 等效性推导文档**（2026-09-16，并入 `docs/si_replica.md`）
   - 已给出 Slonczewski 内核（ε=Pol/2、β=ħ/e）与 SI 的 θ<sub>DL</sub>·C<sub>s</sub> 的数值换算
     （有效因子 ≈Pol/(1+α²)=θ<sub>DL</sub>），含 DL 速率数值对照
@@ -118,7 +123,8 @@
   - 本地 `.git` 有 ~110 MB 松散对象：`git gc --aggressive --prune=now`
   - 验收：`git count-objects -vH` 体积明显下降
 - [ ] **H2（P2, S）备份策略**
-  - 仓库 + `papers/` PDF + `runs/` 原始产物的异地备份（网盘/移动硬盘），定期执行
+  - 仓库 + `papers/` PDF + `runs/` 原始产物的异地备份（网盘/移动硬盘），定期执行；
+    `runs/` 已不入库，异地备份是其唯一冗余
   - 验收：形成书面清单与周期
 - [ ] **H3（P3, M）中间产物归档**
   - OVF/table 等可再生大文件打包到 Release/Zenodo，仓库只保留定稿与摘要

@@ -22,19 +22,20 @@ Supplementary Information item by item (SI Note 3 + Table S1, see
 alpha=0.23, Ms(T)=Ms(0)[1−(T/Tc)^1.7], Kz(T)∝Ms³, and heating as the 0D equivalent
 channel of the SI heat-diffusion model (6×10¹² / 6 ps → peak +50.4 K, τ=245 ps).
 The older runs (guessed parameters, free dT<sub>ref</sub> knob) are kept as `model=legacy`
-in `runs/summary.csv` and `runs/legacy/`.
+in `runs/summary.csv` and `runs/legacy/` (local only — run data is not committed,
+see §6).
 
 ## Results at a glance
 
-| ![](simulations/mumax3_sot/runs/heat_model.png) | ![](simulations/mumax3_sot/runs/phase_map.png) |
+| ![](docs/figures/heat_model.png) | ![](docs/figures/phase_map.png) |
 |---|---|
 | **Thermal model**: SI 1D FD vs the 0D .mx3 channel (`heat_model.py`) | **Threshold map**: mz<sub>final</sub> vs Jp, 4 series (`plot_phase.py`) |
 
-| ![](simulations/mumax3_sot/runs/mechanism_compare.png) | ![](simulations/mumax3_sot/runs/fig4_full.png) |
+| ![](docs/figures/mechanism_compare.png) | ![](docs/figures/fig4_full.png) |
 |---|---|
 | **Mechanism**: heating on/off, θ≈0, Kz(T)/Ms(T) frozen (`plot_mechanism.py`) | **Fig. 4 dynamics**: ΔMz(t) for 6 Hx/I combinations (`plot_fig4.py`) |
 
-| ![](simulations/mumax3_sot/runs/q_quadrants.png) | ![](simulations/mumax3_sot/runs/energy_bars.png) |
+| ![](docs/figures/q_quadrants.png) | ![](docs/figures/energy_bars.png) |
 |---|---|
 | **Four quadrants**: uniform single domains, 5×4 µm device (`plot_quadrants.py`) | **Energy**: ∫J²dt·ρV (`plot_energy.py`) |
 
@@ -51,11 +52,18 @@ in `runs/summary.csv` and `runs/legacy/`.
   only) → switches from 12×10¹², slower (SI Fig. 5 behaviour).
 * **Pulse-width window** at 10×10¹² (heating off): no switching ≤12 ps, switching
   from 15 ps → half-precession-period condition reproduced.
+* **Precessional windows (SI heating)**: θ<sub>DL</sub>=0.2 fails to switch for
+  **15–17×10¹²** and θ<sub>DL</sub>=0.3 for 14–17×10¹² (uniform recapture, |⟨m⟩|=1.000,
+  verified with 1.5 ns free relaxation); switching recovers at 18×10¹² with no
+  further windows up to 30×10¹².
 * **Energy**: model threshold (10×10¹², θ=0.2) → 110 pJ, above the paper's <50 pJ
   budget scale (6×10¹²); absolute thresholds are ~1.5× above the SI values, most
   likely because the SI never specifies the pulse waveform/reflections.
-* **Caveats**: Jp≳1.9×10¹³ drives the model through Tc (HAMR-like, excluded by the
-  paper's experiment); mumax3's Langevin noise has a fixed seed → no P<sub>sw</sub> statistics.
+* **Caveats**: near-threshold / very-high-current points can break the 64×64 film
+  into stripe domains (|⟨m⟩|<0.9, cell size ≈ domain-wall width); those are excluded
+  from the threshold map (grey crosses). Jp≳1.9×10¹³ drives the model through Tc
+  (HAMR-like, excluded by the paper's experiment); mumax3's Langevin noise has a
+  fixed seed → no P<sub>sw</sub> statistics.
 
 Full quantitative record: [`docs/RESULTS.md`](docs/RESULTS.md) (§0 = SI version,
 §1–8 = legacy).
@@ -84,7 +92,8 @@ simulations/mumax3_sot/                # main working directory
    ├─ run_case.py                      # batch runner/archiver (--model si/legacy)
    ├─ plot_phase.py / plot_fig4.py / plot_mechanism.py / plot_quadrants.py
    ├─ plot_table.py / plot_energy.py / energy_check.py
-   └─ runs/                            # summary.csv + figures + cases (si_ prefix)
+   └─ runs/                            # local only (git-ignored): summary.csv + cases
+docs/figures/                          # final figures embedded above
 ```
 
 ## 3. Quick start
@@ -156,12 +165,16 @@ i.e. `sign(mz_final) = -sign(Hx·I)` (all batch runs start from +Mz; the paper's
 | series | threshold Jc | note |
 |---|---|---|
 | θ=0.2, SI heating | (9, 10]×10¹² | Tmax (411,438] K; switches from 10×10¹² (68.3 ps) |
-| θ=0.2, heating off | 20×10¹² (19×10¹² partial, −0.47) | **pure SOT switches** |
+| θ=0.2, heating off | 20×10¹² (19×10¹² ⇒ multidomain, excluded) | **pure SOT switches** |
 | θ=0.3, SI heating | (8, 9]×10¹² | |
-| θ=0.3, heating off | (12, 14]×10¹² (13×10¹² partial) | |
+| θ=0.3, heating off | (12, 14]×10¹² (13×10¹² ⇒ multidomain, excluded) | |
 
-With heating, 15–16×10¹² shows a non-monotonic no-switching window (precessional
-phase effect); switching resumes at 18/20×10¹².
+With heating, θ=0.2 does **not** switch at **15–17×10¹²** (0.98 → uniform recapture; the
+same window is 14–17×10¹² for θ=0.3, where 14×10¹² is a multidomain artefact);
+switching resumes at 18×10¹² and stays on up to 30×10¹² (scan, 1.5 ns relaxation:
+no further windows; 27×10¹² heated is a multidomain artefact). The window is a
+deterministic precessional-recapture effect (the 64×64 film stays a single uniform
+domain, |⟨m⟩|=1.000), superseding the earlier "15–16×10¹², mz=+0.96" wording.
 
 **Mechanism decomposition** (SI heating, θ=0.2):
 
@@ -184,7 +197,9 @@ at Hx=0, period ≈44 ps, peak ΔT +13.9 K (heat model predicts 13.8 K).
 
 Each run writes `out/table.txt` (columns `t, mx, my, mz, E_total, J, T`),
 `out/m_initial.ovf`, `out/m_final.ovf`, `out/log.txt`; `run_case.py` appends to
-`runs/summary.csv` (with `model=si/legacy`). Batch scan example:
+`runs/summary.csv` (with `model=si/legacy`). **`runs/` is git-ignored on purpose:
+run data stays local, the repository only carries code, docs and the final
+figures (`docs/figures/`).** Batch scan example:
 
 ```powershell
 foreach ($Jp in 6,8,10,12) {
@@ -196,13 +211,13 @@ foreach ($Jp in 6,8,10,12) {
 
 One-command figure rebuild: `heat_model.py` → `plot_phase.py` → `plot_fig4.py` →
 `plot_mechanism.py` → `plot_quadrants.py` → `plot_energy.py` (run inside
-`simulations/mumax3_sot/`).
+`simulations/mumax3_sot/`; copy the refreshed PNGs to `docs/figures/`).
 
 ## 7. Simulation roadmap
 
 1. ~~Self-checks~~ (done): relax mz=cos(atan(Hx/B<sub>K</sub>))=0.981; Hx=0 never switches;
    pure-LLG threshold 20×10¹².
-2. ~~Time-resolved dynamics (Fig. 4a,b)~~ (done, SI parameters): `runs/fig4_full.png`.
+2. ~~Time-resolved dynamics (Fig. 4a,b)~~ (done, SI parameters): `docs/figures/fig4_full.png`.
 3. ~~Single-pulse switching (Fig. 3)~~ (done): four quadrants + device threshold (9, 10]×10¹².
 4. ~~Thermal-model calibration~~ (done): `heat_model.py` per SI Eq. S4–S5; 0D channel error 5.1%.
 5. **Micromagnetics & probability (TODO)**: Voronoi grains + seed control
