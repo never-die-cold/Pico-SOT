@@ -1,8 +1,8 @@
 # PicoSOT
 
-**English** | [简体中文](README.zh-CN.md)
+English | [简体中文](README.zh-CN.md)
 
-**mumax3 replica: spin-orbit torque switching with picosecond electrical pulses**
+**mumax3 replica: spin-orbit torque switching with picosecond electrical pulses (SI-parameter model)**
 
 ![license: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)
 ![docs: CC BY 4.0](https://img.shields.io/badge/docs-CC%20BY%204.0-lightgrey.svg)
@@ -16,121 +16,128 @@ A [mumax3](https://mumax.github.io/) replica of:
 > *Nature Electronics* **3**, 680-686 (2020).
 > doi: [10.1038/s41928-020-00488-3](https://doi.org/10.1038/s41928-020-00488-3)
 
-Stack: `Ta(5)/Pt(4)/Co(1)/Cu(1)/Ta(4)/Pt(1) nm` with a perpendicularly magnetized
-Co layer (PMA). Key paper parameters: anisotropy field `Ha ≈ 1 T`,
-`theta_DL = 0.20`, `theta_FL = 0.05`, in-plane bias field `Hx = ±160 mT`,
-time-resolved pulse `3.7 ps`, switching pulse `6 ps`, and a picosecond
-current-density ceiling `Jc ≈ 6e12 A/m^2`.
+**Status (2026-09-16):** the material and thermal model now follows the paper's
+Supplementary Information item by item (SI Note 3 + Table S1, see
+[`docs/si_replica.md`](docs/si_replica.md)): Ms(300 K)=1.0e6 A/m, B_K=0.8 T,
+alpha=0.23, Ms(T)=Ms(0)[1−(T/Tc)^1.7], Kz(T)∝Ms³, and heating as the 0D equivalent
+channel of the SI heat-diffusion model (6e12 / 6 ps → peak +50.4 K, τ=245 ps).
+The older runs (guessed parameters, free dT_ref knob) are kept as `model=legacy`
+in `runs/summary.csv` and `runs/legacy/`.
 
 ## Results at a glance
 
-| ![](simulations/mumax3_sot/runs/phase_map.png) | ![](simulations/mumax3_sot/runs/mechanism_compare.png) |
+| ![](simulations/mumax3_sot/runs/heat_model.png) | ![](simulations/mumax3_sot/runs/phase_map.png) |
 |---|---|
-| **Phase map**: `Jp–Tmax` switching boundary (`plot_phase.py`) | **Mechanism controls**: heating on/off, θ≈0, Ku(T) frozen (`plot_mechanism.py`) |
+| **Thermal model**: SI 1D FD vs the 0D .mx3 channel (`heat_model.py`) | **Threshold map**: mz_final vs Jp, 4 series (`plot_phase.py`) |
 
-| ![](simulations/mumax3_sot/runs/fig4_full.png) | ![](simulations/mumax3_sot/runs/q_quadrants.png) |
+| ![](simulations/mumax3_sot/runs/mechanism_compare.png) | ![](simulations/mumax3_sot/runs/fig4_full.png) |
 |---|---|
-| **Fig. 4 dynamics**: ΔMz(t) for 6 Hx/I combinations + echo (`plot_fig4.py`) | **Quadrants**: final states, uniform single domain (`plot_quadrants.py`) |
+| **Mechanism**: heating on/off, θ≈0, Kz(T)/Ms(T) frozen (`plot_mechanism.py`) | **Fig. 4 dynamics**: ΔMz(t) for 6 Hx/I combinations (`plot_fig4.py`) |
 
----
+| ![](simulations/mumax3_sot/runs/q_quadrants.png) | ![](simulations/mumax3_sot/runs/energy_bars.png) |
+|---|---|
+| **Four quadrants**: uniform single domains, 5×4 µm device (`plot_quadrants.py`) | **Energy**: ∫J²dt·ρV (`plot_energy.py`) |
 
-## 1. Repository layout
+## 1. Key findings (SI-parameter model)
+
+* **Pure SOT switches without Joule heating**: threshold 20e12 at θ_DL=0.2
+  (~13.5e12 at θ_DL=0.3); with the SI heat channel it drops to 10e12 / ~8.5e12 →
+  **heating lowers the threshold current by ~2× (energy by ~2.3–4×)**, matching the
+  ratio in the paper's SI Fig. 3/4 (pure LLG 9e12 → with heating 6e12, ~2× energy).
+* **Polarity rule** `sign(mz_final) = −sign(Hx·I)` (full-device four quadrants);
+  `Hx=0` never switches (symmetry breaking required).
+* **Mechanism decomposition**: Kz(T) frozen → no switching up to 14e12 (necessary
+  channel); Ms(T) frozen alone → near-switching; θ≈0 (thermal-anisotropy torque
+  only) → switches from 12e12, slower (SI Fig. 5 behaviour).
+* **Pulse-width window** at 10e12 (heating off): no switching ≤12 ps, switching
+  from 15 ps → half-precession-period condition reproduced.
+* **Energy**: model threshold (10e12, θ=0.2) → 110 pJ, above the paper's <50 pJ
+  budget scale (6e12); absolute thresholds are ~1.5× above the SI values, most
+  likely because the SI never specifies the pulse waveform/reflections.
+* **Caveats**: Jp≳1.9e13 drives the model through Tc (HAMR-like, excluded by the
+  paper's experiment); mumax3's Langevin noise has a fixed seed → no P_sw statistics.
+
+Full quantitative record: [`docs/RESULTS.md`](docs/RESULTS.md) (§0 = SI version,
+§1–8 = legacy).
+
+## 2. Repository layout
 
 ```
-README.md                              # project overview (this file, English)
+README.md                              # this file
 README.zh-CN.md                        # Chinese version
-FACTS.md                               # fact sheet: parameters / conventions / verified results (Chinese)
-CITATION.cff                           # citation metadata (GitHub "Cite this repository")
-LICENSE                                # MIT (code)
-LICENSE-docs                           # CC BY 4.0 (documentation)
-requirements.txt                       # Python dependencies for post-processing scripts
+FACTS.md                               # fact sheet: parameters/conventions/results (zh)
+CITATION.cff                           # citation metadata
+LICENSE / LICENSE-docs                 # MIT (code) / CC BY 4.0 (docs)
+requirements.txt                       # Python dependencies for post-processing
 docs/
-├─ RESULTS.md                          # full experiment log (verified results, English)
-└─ ROADMAP.md                          # improvement plan and TODO list (Chinese)
-papers/                                # references (PDFs are not redistributed)
-├─ README.md                           # DOI list for NE 2020 / NC 2026 / AM 2023
-└─ mumax3_docs/                        # mumax3 papers, tutorial and related refs (local only)
-notes/                                 # working notes; only error.md is published
-└─ error.md                            # mumax3 replica pitfalls (published)
-simulations/
-└─ mumax3_sot/                         # main workdir: time-exact scripts + batch results
-   ├─ fig4_dynamics.mx3                # Fig.4 dynamics: PBC infinite film + echo + RK4
-   ├─ fig3_switching.mx3               # Fig.3 5x4 um device single-pulse switching (fixed step)
-   ├─ macrospin_switch.mx3             # 64x64 fast-switching template (Jp/dT_ref/KuExp/theta knobs)
-   ├─ run_case.py                      # batch run + archive: runs\<tag>\{<tag>.mx3, out\}
-   ├─ plot_table.py                    # table.txt -> dMz/Ms, dT curves
-   ├─ plot_phase.py                    # summary.csv -> Jp-Tmax phase map and boundary curves
-   ├─ plot_fig4.py                     # a_f4_* -> Fig.4 dMz(t) (parallel/antiparallel/no Hx)
-   ├─ plot_mechanism.py                # c0/b0, b2, b3 mechanism comparison, 3 panels
-   ├─ plot_quadrants.py                # q1-q4 m_final.ovf -> final-state 2x2 panels
-   ├─ energy_check.py                  # energy accounting \int J^2 dt rho V (vs paper <50 pJ)
-   ├─ fig3_switching.out/              # Fig.3 device reference run output
-   ├─ fig4_dynamics.out/               # Fig.4 reference run output
-   └─ runs/                            # batch results: summary.csv + final figures + per-case table/log/ovf
+├─ RESULTS.md                          # full experiment log (§0 SI / §1-8 legacy)
+├─ ROADMAP.md                          # TODO list (zh)
+└─ si_replica.md                       # SI ↔ mumax3 mapping + heat-model calibration (zh)
+papers/                                # literature (PDFs not distributed)
+notes/
+└─ error.md                            # published pitfall log (notes/NE_2020SI is local only)
+simulations/mumax3_sot/                # main working directory
+   ├─ macrospin_switch.mx3             # 64×64 fast template (SI params + heat + knobs)
+   ├─ fig3_switching.mx3               # 5×4 µm full-device single-pulse switching
+   ├─ fig4_dynamics.mx3                # Fig.4 dynamics (PBC film + echo)
+   ├─ heat_model.py                    # SI 1D heat-diffusion FD calibration
+   ├─ run_case.py                      # batch runner/archiver (--model si/legacy)
+   ├─ plot_phase.py / plot_fig4.py / plot_mechanism.py / plot_quadrants.py
+   ├─ plot_table.py / plot_energy.py / energy_check.py
+   └─ runs/                            # summary.csv + figures + cases (si_ prefix)
 ```
 
-* `simulations/mumax3_sot/fig4_dynamics.mx3` — models an infinite film with `SetPBC`,
-  a Gaussian pulse and an optional transmission-line echo; outputs `T(t)`, `J(t)`, `Ms(t)`
-  for direct comparison with the paper's Fig. 4a/4b.
-* Other notes (paper translation, handover doc, slide outline, ...) are local working
-  drafts and are not published; the only published note is `notes/error.md`.
+## 3. Quick start
 
-## 2. Quick start
-
-Requirements: Python 3.12 (`pip install -r requirements.txt`) and
-[mumax3](https://mumax.github.io/) v3.12 (CUDA 12.9, NVIDIA GPU).
+Environment: Python 3.12 (`pip install -r requirements.txt`) +
+[mumax3](https://mumax.github.io/) v3.12 (CUDA 12.9, NVIDIA GPU required).
 
 ```powershell
 # Recommended: run through run_case.py (auto-archiving + parameter substitution)
 # If mumax3 is not at the default path: set MUMAX3_BIN, or pass --mumax <path>
 python simulations/mumax3_sot/run_case.py `
-    simulations/mumax3_sot/macrospin_switch.mx3 b1_Jp8dT450 `
-    --set Jp=8e12 J_ref=8e12 dT_ref=450
+    simulations/mumax3_sot/macrospin_switch.mx3 si_h_t20_Jp8 `
+    --set Jp=8e12 Heating=1
 ```
 
-All knobs live in the **user parameter block** at the top of `macrospin_switch.mx3`:
+Parameters live in the user block at the top of `macrospin_switch.mx3`:
 
-| Variable | Meaning |
+| variable | meaning |
 |---|---|
-| `RunDynamics` | 0 = 6 ps switching experiment; 1 = 3.7 ps time-domain response |
-| `I_sign` | current polarity, `+1` corresponds to the paper's `+I` |
-| `InitMz` | initial state, `+1` (up) / `-1` (down) |
-| `Hx_mT` | in-plane bias field (mT) |
-| `Jp` | peak current density (A/m²) |
-| `Heating` / `dT_ref` / `J_ref` / `tau_cool` | Joule-heating model switch and calibration |
-| `KuExp` | `Ku(T)=Ku0·(Ms(T)/Ms0)^KuExp`; `0` disables Ku(T) (used for B3) |
-| `t_free` | free evolution time after the pulse |
+| `Jp` / `tp_ps` | peak current density / pulse FWHM (ps) |
+| `ThetaDL` | θ_DL (0.20 main-text fit; 0.30 = SI Fig. 3–5 value) |
+| `Hx_mT` / `I_sign` / `InitMz` | in-plane bias field / current polarity / initial state |
+| `Heating` | 1 = SI heat channel (Ms/Kz follow T); 0 = frozen 300 K (pure LLG) |
+| `ScaleMs` / `ScaleKz` | freeze Ms(T) / Kz(T) independently (mechanism decomposition) |
+| `Noise` | 1 = Langevin noise at T(t) (fixed seed) |
+| `t_free` | free evolution after the pulse |
 
-## 3. Two key conventions (pitfalls)
+Thermal constants (ρ, C, Λ, G, d_stack) and the Ms(T)/Kz(T) laws are hard-coded in
+the scripts; see `docs/si_replica.md`. `heat_model.py` re-derives them and plots.
 
-1. **Anisotropy**: mumax3's `Ku1` is the *total* uniaxial anisotropy, so the thin-film
-   demagnetizing energy has to be added explicitly:
+## 4. Two key conventions (pitfalls, see notes/error.md)
 
-   ```go
-   Keff  := 0.5*Ms*Ha_T                  // Ha_T in tesla as a B field; Keff = 1/2*Ms*Ha_T
-   Ku1    = Keff + 0.5*mu0*Ms*Ms         // Ms=1.3e6, Ha=1T -> Keff=6.5e5, Ku1=1.71e6 J/m^3
-   ```
-
-   Writing `0.5*mu0*Ms*1.0` (treating 1 T as A/m) yields `Ku1 ≈ mu0*Ms²/2`:
-   PMA disappears, the magnetization relaxes in-plane, and it **looks like
-   "switching is impossible"**.
-
-2. **How SOT is injected**: mumax3 has no native SOT, so the standard approach uses the
-   Slonczewski module — but the `cuda/slonczewski2.cu` kernel **reads only the
-   z component of the current density**, hence:
+1. **Anisotropy**: the current scripts set `Ku1 = Kz(T)` directly (the SI's Kz);
+   together with mumax3's thin-film demag this realizes the SI field
+   `H_z=(2Kz/μ0Ms−Ms)m_z` exactly. Do **not** use the legacy
+   `Ku1=Keff+½μ0Ms²` form, and never treat 1 T as A/m (that yields
+   Ku1≈μ0Ms²/2, the PMA disappears).
+2. **SOT emulation**: mumax3 has no native SOT; use the Slonczewski module — its
+   kernel (`cuda/slonczewski2.cu`) reads **only the z component** of the current:
 
    ```go
-   FixedLayer   = vector(0, 1, 0)   // spin polarization sigma along y (SOT geometry, current along x)
-   Pol          = 0.20              // = theta_DL
+   FixedLayer   = vector(0, 1, 0)   // sigma along y (in-plane current along x)
+   Pol          = ThetaDL           // = theta_DL (0.2 or 0.3)
    EpsilonPrime = 0.05              // = theta_FL
-   Lambda       = 1                 // Slonczewski efficiency eps = Pol/2 = standard spin-Hall factor
+   Lambda       = 1
    J            = vector(0, 0, J_eff)
-   DisableZhangLiTorque = true      // Xi only affects Zhang-Li, irrelevant to SOT
+   DisableZhangLiTorque = true
+   FreeLayerThickness   = 1e-9
    ```
 
-   With `J = vector(Jc, 0, 0)` the torque is identically zero.
+   `J = vector(Jc, 0, 0)` produces zero torque.
 
-**Polarity calibration** (measured in-script, consistent with the paper's Fig. 3):
+**Polarity calibration** (full device, matches paper Fig. 3):
 
 | Hx | I_sign | final state |
 |---|---|---|
@@ -139,155 +146,94 @@ All knobs live in the **user parameter block** at the top of `macrospin_switch.m
 | −160 mT | +1 | +Mz |
 | −160 mT | −1 | −Mz |
 
-i.e. `sign(mz_final) = -sign(Hx·I)` (all current batch runs start from +Mz; "independent of
-the initial state" is the paper's conclusion, not separately reproduced here); `Hx = 0`
-does not switch (symmetry breaking is required).
+i.e. `sign(mz_final) = -sign(Hx·I)` (all batch runs start from +Mz; the paper's
+"independent of initial state" was not re-run here); `Hx = 0` does not switch.
 
-## 4. Verified results (2026-09-15, time-exact 6 ps pulse)
+## 5. Verified results (2026-09-16, SI parameters)
 
-> Full experiment log (all controls and energy accounting) in [`docs/RESULTS.md`](docs/RESULTS.md).
+**Thresholds** (macrospin 64×64, 6 ps sech², Hx=160 mT; Tmax=300+50.4(Jp/6e12)² K):
 
-`macrospin_switch.mx3` (64×64, 5 nm cells, `Ms=1.3e6 A/m`, `Ha=1 T`, `alpha=0.15`,
-sech² pulse FWHM=6 ps, measured 5.85 ps). Energy accounting (`energy_check.py`,
-ρ=81 µΩ cm, V=5×4 µm²×15 nm): **39.7 pJ at Jp=6e12**, consistent with the paper's 40 pJ.
+| series | threshold Jc | note |
+|---|---|---|
+| θ=0.2, SI heating | (9,10]e12 | Tmax (411,438] K; switches from 10e12 (68.3 ps) |
+| θ=0.2, heating off | 20e12 (19e12 partial, −0.47) | **pure SOT switches** |
+| θ=0.3, SI heating | (8,9]e12 | |
+| θ=0.3, heating off | (12,14]e12 (13e12 partial) | |
 
-**B1 switching (J_ref=Jp, dT ∝ J²)**
+With heating, 15–16e12 shows a non-monotonic no-switching window (precessional
+phase effect); switching resumes at 18/20e12.
 
-| Condition | Tmax | mz zero crossing | Final mz | Energy | Outcome |
-|---|---|---|---|---|---|
-| Jp=6e12, dT=300 K | 583 K | – | +0.988 | 39.7 pJ | **no switching** (not even at the paper's current ceiling) |
-| Jp=8e12, dT=450 K | 725 K | 58.6 ps | −0.988 | 70.6 pJ | switches |
-| Jp=1.2e13, dT=450 K | 725 K | 50.1 ps | −0.988 | 158.9 pJ | switches |
-| Jp=2.0e13, dT=450 K | 725 K | **39.0 ps (fastest)** | −0.988 | 441 pJ | paper's model predicts 16 ps; gap comes from SI parameters |
+**Mechanism decomposition** (SI heating, θ=0.2):
 
-**Controls and mechanism experiments**
+| control | result |
+|---|---|
+| `ScaleKz=0` (Kz frozen) | no switching at 10/12/14e12 → Kz(T) collapse is necessary |
+| `ScaleMs=0` (Kz collapse only) | 10e12 +0.45, 12e12 −0.46 (near switching) |
+| θ≈0 (thermal-anisotropy torque only) | switches at 12e12 (122.5 ps), 14e12 (80.2 ps) — SI Fig. 5 |
+| `Hx_mT=0` | never switches |
 
-* **Quadrants**: `sign(mz_final) = −sign(Hx·I)`; `Hx=0` does not switch (C2, `runs/q_quadrants.png`).
-  Final states are uniform single domains (no domains walls; only the open-boundary edge
-  columns stay pinned).
-* **B2 θ≈0** (`Pol=1e-4, EpsilonPrime=0`, Jp=8e12): no switching at dT=300 K; switches at
-  dT=450/600/800 K after **85.9/92.3/122.4 ps** → qualitatively reproduces SI Fig. 5
-  (thermal anisotropy torque alone can switch, but slower and hotter).
-* **B3 Ku(T) switch-off**: `KuExp=0` (T-independent Ku) does not switch even at Jp=1.4e13;
-  `KuExp=3` partially switches at 1e13 (final −0.11) and fully at 1.2e13 → the thermal
-  anisotropy torque is essential, threshold energy ratio ≥ 2 (the paper's "2× lower energy").
-* **C0 Heating=0 control** (same parameters as `b0_6e12`/`b0_8e12`/`b1_Jp10_dT300`, heating off):
-  Jp=6/8/10e12 all fail to switch (final mz≈+0.988, T=300 K), transient dip only
-  −8.1%/−12.4%/−17.6% (relative to the relaxed equilibrium 0.988, ≈33 ps) → deterministic
-  switching at 6–10e12 fully relies on Joule-heating-induced thermal anisotropy torque
-  (`runs/c0_noh_*`, `runs/heating_on_off.png`).
-* **C1 phase-boundary midpoints** (J_ref=Jp): no switch at 9e12/300 K (final +0.933);
-  8e12/375 K switches at 66.5 ps; 7e12/450 K at 61.0 ps; 6e12/600 K at 80.5 ps.
-  Boundaries: `Jc∈(9,10]e12` on the Tmax≈583 K line; `dTc∈(300,375]K` on the Jp=8e12 line.
-  Final figures `runs/phase_map.png`, `phase_traces.png`, `phase_speed.png` (`plot_phase.py`).
-* **C2 Hx=0 symmetry control** (`runs/c2_Hx0_Jp8_dT450`, identical parameters to
-  `b1_Jp8_dT450` except `Hx_mT=0`): transient minimum mz=0.80 (40.2 ps), then recovery;
-  final **+1.0000**, no zero crossing (Tmax=725 K) → contrast with the 58.6 ps switching at
-  `Hx=+160 mT`; `Hx≠0` is required for symmetry breaking.
-* **Mechanism overview** `runs/mechanism_compare.png` (`plot_mechanism.py`): three panels
-  (a) c0/b0 heating on/off, (b) b2 θ≈0, (c) b3 Ku(T) frozen; solid/dashed lines are the
-  control arms, thin dash-dotted lines of the same color show T(t).
-* **Fig. 4 dynamics** (echo `echo=0.3, ted=24 ps`; `runs/fig4_full.png`, `plot_fig4.py`;
-  legend grouped into parallel / antiparallel / no Hx): `Hx=0` ± I curves coincide with no
-  oscillation; the parallel group (Hx+,I+) and (Hx−,I−) coincide and the antiparallel group
-  (Hx+,I−) and (Hx−,I+) coincide, with opposite ΔMz phase (antiparallel shows no positive
-  overshoot, ΔMz minimum −3.5% @31.8 ps; the +1.3% spike at t=0 is an un-relaxed first-row
-  artifact); the echo appears as a secondary peak in T(t) at ~29 ps (t0+ted).
-* **Corrected re-runs of the early reference** (`RunDynamics=1`, 3.7 ps FWHM, Jp=1e12):
-  `runs/dyn_Jp1e12_Ip` gives Tmax≈308 K, mz_final=+0.9879 (no switching), consistent with
-  the early reference; the switching-type reference is `runs/b0_6e12`.
+**Full device** (5×4 µm, Jpk=1.2e13, Tmax=497 K): four-quadrant polarity ✓,
+threshold (9,10]e12 consistent with macrospin, `Hx=0` (12e12) does not switch.
 
-> ⚠ **Historical note**: the early adaptive-step "Jp=6e12 switching" was an artifact of the
-> pulse being stretched to 27.6 ps (see `notes/error.md` §1.11). Those outputs were deleted
-> and re-run with the corrected scripts (switching `runs/b0_6e12`, dynamics
-> `runs/dyn_Jp1e12_Ip`); the table above reflects the fixed-step + real-time pulse
-> (`SetSolver(4)+FixDt` + `J(t)`) re-runs.
+**Fig. 4 dynamics**: parallel dip −5.9% @29 ps, antiparallel −1.9%, no oscillation
+at Hx=0, period ≈44 ps, peak ΔT +13.9 K (heat model predicts 13.8 K).
 
-## 5. Output and post-processing
+**Energy**: 6e12 → 39.7 pJ (paper scale); 10e12 → 110 pJ; 20e12 → 441 pJ.
 
-Each run produces:
+## 6. Output and post-processing
 
-* `out/table.txt` — columns: `t, mx, my, mz, E_total, J, T` (time in s, J in A/m², T in K;
-  the fig3/fig4 scripts have no `E_total` and use an `Ms` (A/m) column instead)
-* `out/m_*.ovf` — magnetization snapshots (`OVF2_BINARY`)
-* `out/log.txt` — console log with the average mz after relax/pulse
-
-```python
-import pandas as pd
-df = pd.read_csv("out/table.txt", sep="\t")
-df.columns = [c.lstrip("# ").strip() for c in df.columns]
-df["t_ps"] = df["t (s)"] * 1e12
-```
+Each run writes `out/table.txt` (columns `t, mx, my, mz, E_total, J, T`),
+`out/m_initial.ovf`, `out/m_final.ovf`, `out/log.txt`; `run_case.py` appends to
+`runs/summary.csv` (with `model=si/legacy`). Batch scan example:
 
 ```powershell
-mumax3-convert -png out/m_final.ovf      # quick figure
-mumax3-convert -vtk out/m_final.ovf      # for ParaView
-```
-
-Parameter sweep (example: switching threshold vs Jp, `J_ref=Jp` means `dT ∝ J²`):
-
-```powershell
-foreach ($Jp in "6e12","8e12","1.2e13") {
+foreach ($Jp in 6,8,10,12) {
     python simulations/mumax3_sot/run_case.py `
-        simulations/mumax3_sot/macrospin_switch.mx3 "b1_Jp$Jp" `
-        --set "Jp=$Jp" "J_ref=$Jp" dT_ref=450
+        simulations/mumax3_sot/macrospin_switch.mx3 "si_h_t20_Jp$Jp" `
+        --set "Jp=${Jp}e12" Heating=1
 }
-# each run appends to runs/summary.csv (tag, t_cross_ps, recov_50ps, mz_final, ...)
 ```
 
-## 6. Simulation roadmap
+One-command figure rebuild: `heat_model.py` → `plot_phase.py` → `plot_fig4.py` →
+`plot_mechanism.py` → `plot_quadrants.py` → `plot_energy.py` (run inside
+`simulations/mumax3_sot/`).
 
-1. **Self-checks**: after `relax`, `mz ≈ cos[atan(Hx/Ha)] ≈ 0.988`; confirm that `Hx=0` does
-   not switch, that reversing the current polarity reverses the final state, and that
-   6/8/10e12 do not switch with heating off (`runs/c0_noh_*`).
-2. **Time-domain dynamics (Fig. 4a,b)**: `RunDynamics=1` (or `fig4_dynamics.mx3`), 6 Hx/I
-   combinations (Hx∈{0,±160 mT} × I±, all starting from +Mz), plot `ΔMz(t)`; without Hx the
-   oscillation disappears and ±current are 180° out of phase.
-3. **Single-pulse switching (Fig. 3/4d)**: `macrospin_switch.mx3` (or the full device
-   `fig3_switching.mx3`), `RunDynamics=0`; for the real 6 ps pulse: `Jc∈(9,10]e12` on the
-   `Tmax≈583 K` line, and at `dT=450 K` even `7e12` switches (C1). Quadrants are batch-verified
-   (`runs/q1–q4`, `runs/a_f4_*`); scanning Hx qualitatively reproduces `Jc ∝ 1/Hx`.
-4. **Heating-model calibration**: the heating model here is phenomenological (`dT ∝ J²`
-   low-pass + `Ms(T)`/`Ku(T)` scaling, `Tc=800 K`). Calibration targets: 1–2% demagnetization
-   at low current and recovery in ~300–400 ps. mumax3's `Temp` only adds Langevin noise and
-   does not scale `Ms/Ku`, so `Msat` and `Ku1` are updated step by step in-script.
-5. **Micromagnetics and probability (optional)**: move to 1024×800 (5×4 µm device) + Voronoi
-   grain anisotropy disorder, and collect `P_sw(Jp)` over random seeds, corresponding to the
-   paper's >91% switching probability and nucleation images.
-6. **Energy estimate**: `python simulations/mumax3_sot/energy_check.py runs/<tag>` integrates
-   the real `J(t)` from the table (`rho=81 µΩ cm`, `V=5×4 µm²×15 nm`); 6e12/6 ps → 39.7 pJ
-   (consistent with the paper); switching cases in this model cost 39.7–441 pJ
-   (54.1 pJ @7e12/dT450; 39.7 pJ @6e12/dT600 with Tmax=867 K > Tc, close to the HAMR-like
-   regime the paper excludes).
+## 7. Simulation roadmap
 
-Planned and deferred work (probability statistics, heating calibration, CI, release/Zenodo,
-...) is tracked in [`docs/ROADMAP.md`](docs/ROADMAP.md).
+1. ~~Self-checks~~ (done): relax mz=cos(atan(Hx/B_K))=0.981; Hx=0 never switches;
+   pure-LLG threshold 20e12.
+2. ~~Time-resolved dynamics (Fig. 4a,b)~~ (done, SI parameters): `runs/fig4_full.png`.
+3. ~~Single-pulse switching (Fig. 3)~~ (done): four quadrants + device threshold (9,10]e12.
+4. ~~Thermal-model calibration~~ (done): `heat_model.py` per SI Eq. S4–S5; 0D channel error 5.1%.
+5. **Micromagnetics & probability (TODO)**: Voronoi grains + seed control
+   (mumax3 Langevin is fixed-seed) → P_sw(Jp), paper's >91% switching probability.
+6. **Energy**: `energy_check.py runs/<tag>` integrates the actual J(t).
 
-## 7. Known limitations
+See [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
-* Early adaptive-step outputs (pulse stretched to ~28 ps, `notes/error.md` §1.11) were
-  **deleted**; equivalent cases were re-run with the corrected scripts (switching
-  `runs/b0_6e12`, dynamics `runs/dyn_Jp1e12_Ip`). All conclusions now come from the corrected
-  scripts.
-* `macrospin_switch.mx3` / `fig3_switching.mx3` use a uniform-Ku model without nucleation,
-  domain walls or disorder.
-* Heating is phenomenological (`dT ∝ J²` low-pass + `Ms(T)/Ku(T)` scaling); exact fitting
-  should follow the paper's SI.
-* Transmission-line reflection (echo) is approximated by a delayed, superposed pulse.
-* The paper's quasi-static `Jc(Hx)` (100 µs pulses) relies on thermal activation and is not
-  directly reproducible with long LLG runs.
+## 8. Known limitations
 
-## 8. Citing
+* Pulse waveform assumed sech² (SI does not specify) → absolute thresholds ~1.5×
+  above the SI values (ratios match);
+* uniform-anisotropy model, no nucleation/domain walls, no switching statistics;
+* Jp≳1.9e13 exceeds Tc (HAMR-like, excluded experimentally in the paper);
+* transmission-line reflections (echo) approximated by a delayed pulse;
+* the paper's quasi-static Jc(Hx) (100 µs pulses) is thermally activated and not
+  reproducible by long-time LLG;
+* legacy results (guessed parameters) are kept for reference only — do not mix
+  with the SI version.
 
-If you use this repository, please cite the original paper and mumax3 (both are included in
-[`CITATION.cff`](CITATION.cff), also available via GitHub's "Cite this repository"):
+## 9. Citing
+
+If you use this repository, please cite the original paper and mumax3
+(`CITATION.cff` carries both; GitHub's "Cite this repository" exports them):
 
 * doi:10.1038/s41928-020-00488-3
 * A. Vansteenkiste et al., *AIP Advances* **4**, 107133 (2014).
 
-## 9. License
+## 10. License
 
-* **Code** (`.py` / `.mx3` under `simulations/`, `requirements.txt`): MIT, see [`LICENSE`](LICENSE);
-* **Documentation** (README, `FACTS.md`, `docs/`, `notes/error.md`): CC BY 4.0, see [`LICENSE-docs`](LICENSE-docs);
-* The paper PDFs in `papers/` remain the copyright of their authors and publishers, are
-  **not redistributed** in this repository, and are not covered by the licenses above.
+* **Code** (`.py`/`.mx3` under `simulations/`, `requirements.txt`): MIT, see [`LICENSE`](LICENSE);
+* **Docs** (README, `FACTS.md`, `docs/`, `notes/error.md`): CC BY 4.0, see [`LICENSE-docs`](LICENSE-docs);
+* Paper PDFs in `papers/` remain with their authors/publishers and are **not
+  distributed** with this repository.
