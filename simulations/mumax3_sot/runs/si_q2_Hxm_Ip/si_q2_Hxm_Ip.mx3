@@ -1,0 +1,132 @@
+// ============================================================================
+// Fig. 3 replica - deterministic SOT switching by ONE 6-ps current pulse
+// Paper: Jhuria et al., Nature Electronics 3, 680-686 (2020)
+//        doi:10.1038/s41928-020-00488-3
+//
+// Geometry: the current-carrying window of the magnetic load, 5 um x 4 um
+//           Co(1 nm), finite film (edges included -> possible nucleation).
+//
+// SI REPLICA (2026-09): material/thermal parameters follow the Supplementary
+// Information (Note 3, Table S1): Ms(300 K)=1.0e6 A/m, B_K(300 K)=0.8 T,
+// alpha=0.23, Tc=800 K, Ms(T)=Ms(0)[1-(T/Tc)^1.7], Kz(T)=Kz(0)(Ms/Ms0)^3,
+// Ku1 = Kz; heating dT/dt = rho*J^2/C - (T-Troom)/tau with tau = C*d/G_int
+// = 245 ps (0D channel of the SI 1D heat-diffusion model, heat_model.py).
+// At Jpk=1.2e13 the SI-model peak rise is ~202 K (Tmax ~ 502 K).
+//
+// SOT emulation (mumax3 has no native xiDL/xiFL):
+//   Slonczewski module with  Pol = theta_DL, Lambda = 1,
+//   EpsilonPrime = theta_FL, FixedLayer = sigma, and J along z
+//   (the Slonczewski kernel reads only J.z).
+//   Verified prefactor: dm/dt|DL = gamma (hbar/2e) Pol J/(Ms t) m x (m x sigma).
+//
+// Sign convention of the paper: parallel (Hx>0, I>0) -> -Mz.
+//   Here: FixedLayer = (0,-1,0), Isign=+1, Hx=+160 mT.
+//   Flip Isign (or FixedLayer.y) to test the other three quadrants of Fig. 3.
+// ============================================================================
+
+// ---------------- geometry: 5 um x 4 um current window ----------------
+Nx := 500
+Ny := 400
+SetGridSize(Nx, Ny, 1)
+SetCellSize(5e-6/Nx, 4e-6/Ny, 1e-9)
+
+// ---------------- material (SI Table S1) ----------------
+Ms300  := 1.0e6                        // A/m at 300 K (VSM)
+BK300  := 0.8                          // T, PMA field at 300 K (SI fit)
+Kz300  := 0.5*Ms300*(BK300 + mu0*Ms300)
+Troom  := 300.0
+Tc     := 800.0
+fr300  := 1.0 - pow(Troom/Tc, 1.7)
+Ms0    := Ms300/fr300                  // Ms(0)
+Kz0    := Kz300/pow(fr300, 3.0)        // Kz(0)
+Msat   = Ms300                         // NOTE: mumax3 default Msat is 0!
+Aex    = 3e-11
+alpha  = 0.23                          // SI fit (effective, incl. inh. broadening)
+Ku1    = Kz300
+AnisU  = vector(0, 0, 1)
+// Dind = 0 (paper inserted Cu to suppress DMI)
+
+// ---------------- SOT (Slonczewski-as-SOT) ----------------
+DisableZhangLiTorque = true
+Pol          = 0.20                   // theta_DL (main-text fit)
+EpsilonPrime = 0.05                   // theta_FL
+Lambda       = 1
+FreeLayerThickness = 1e-9
+FixedLayer   = vector(0, -1, 0)
+J = vector(0, 0, 0)
+
+// ---------------- in-plane bias field ----------------
+Hx    := -0.160                       // T (paper: 160 mT)
+Isign := 1
+B_ext  = vector(Hx, 0, 0)
+
+// ---------------- pulse + SI Joule heating ----------------
+Jpk  := 1.2e13                        // A/m^2 peak current density
+tp   := 6.0e-12                       // pulse FWHM = 6 ps (switching shots)
+t0   := 5e-12                         // pulse arrival time
+echo := 0.0                           // electrical-reflection amplitude
+ted  := 24e-12                        // reflection delay
+ln2x4 := 2.772588722239781            // 4*ln2
+
+rho_e   := 81e-8                      // Ohm m (SI)
+C_vol   := 2.6e6                      // J/m3/K (SI)
+d_stack := 16e-9                      // m
+tauC    := C_vol*d_stack/170e6        // 245 ps (C*d/G_int)
+Tcur    := Troom
+
+// ---------------- accurate, reproducible time stepping ----------------
+SetSolver(4)                          // classical RK4 with fixed step
+FixDt = 5e-14                         // 0.05 ps
+
+// ---------------- output ----------------
+Jcur   := 0.0
+Ms_cur := Ms300
+TableAddVar(Tcur,   "T",  "K")
+TableAddVar(Jcur,   "J",  "A/m^2")
+TableAddVar(Ms_cur, "Ms", "A/m")
+TableAutoSave(0.5e-12)
+OutputFormat = OVF2_BINARY
+// NOTE: do NOT also call AutoSnapshot(): it shares the autosave slot and
+// silently replaces the OVF autosaves. Convert OVFs afterwards instead:
+//   mumax3-convert -png m0*.ovf
+AutoSave(m, 25e-12)                   // OVF snapshot every 25 ps
+
+// ---------------- initial state ----------------
+m = Uniform(0, 0, 1)
+relax()
+saveas(m, "m_initial")
+print("relaxed m = ", m.average())
+
+// ---------------- current pulse (exact in t) ----------------
+J = vector(0, 0, Isign*Jpk*(exp(-ln2x4*pow((t-t0)/tp, 2)) + echo*exp(-ln2x4*pow((t-t0-ted)/tp, 2))))
+
+// ---------------- time loop: pulse + heating ----------------
+tmax  := 400e-12
+stp   := 0.25e-12
+niter := 1600
+tprev := 0.0
+for i := 0; i < niter; i++ {
+	tb      := t
+	Jcur     = Isign*Jpk*(exp(-ln2x4*pow((tb-t0)/tp, 2)) + echo*exp(-ln2x4*pow((tb-t0-ted)/tp, 2)))
+	dtr     := tb - tprev
+	heat    := rho_e*Jcur*Jcur/C_vol             // SI q = rho J^2 (K/s)
+	Tcur     = (Tcur + heat*dtr + Troom*dtr/tauC)/(1 + dtr/tauC)
+	fr      := 1.0 - pow(Tcur/Tc, 1.7)           // SI Ms(T)
+	fr       = 0.5*(fr + abs(fr))                // clamp at 0 (T >= Tc)
+	Ms_cur   = Ms0*fr
+	Msat     = Ms_cur
+	Ku1      = Kz0*pow(fr, 3.0)                  // SI Kz(T)
+	tprev    = tb
+	run(stp)
+}
+J    = vector(0, 0, 0)
+Jcur = 0.0
+tableSave()
+saveas(m, "m_final")
+mzavg := m.average().Z()
+print("final mz = ", mzavg)
+if mzavg < -0.5 {
+	print("result: switched (+Mz -> -Mz)")
+} else {
+	print("result: NOT switched (raise Jpk, or check Hx and Isign)")
+}

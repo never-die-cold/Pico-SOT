@@ -1,0 +1,144 @@
+//mumax 3.12 [windows_amd64 go1.26.0(gc) CUDA-12.9]
+//commit hash: 6e5c98bb
+//CPU info: Unknown, Error: exec: "wmic": executable file not found in %PATH%
+//GPU info: NVIDIA GeForce RTX 5060 Laptop GPU(8150MB), CUDA Driver 13.2, cc=12.0, using cc=120 PTX
+//OS  info: Windows OS, Hostname: never-die-cold
+//Timestamp: 2026-09-16 10:15:17
+//(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium
+//This is free software without any warranty. See license.txt
+//********************************************************************//
+//  If you use mumax in any work or publication,                      //
+//  we kindly ask you to cite the references in references.bib        //
+//********************************************************************//
+//output directory: E:\_SOT_MARM\simulations\mumax3_sot\runs\si_noh_t20_Jp10_pw30\out/
+RunDynamics := 0
+CaseName := "switch"
+I_sign := 1
+InitMz := 1
+Hx_mT := 160
+Jp := 10e12
+Heating := 0
+Noise := 0
+ThetaDL := 0.2
+tp_ps := 30
+t_free := 400e-12
+Nx := 64
+Ny := 64
+SetGridSize(Nx, Ny, 1)
+SetCellSize(5e-9, 5e-9, 1e-9)
+// WARNING: cell size was set to a high aspect ratio.
+//          Calculation of demag kernel may take longer than usual.
+//          Note that this can exacerbate discretization anisotropy.
+Ms300 := 1.0e6
+BK300 := 0.8
+Kz300 := 0.5 * Ms300 * (BK300 + mu0*Ms300)
+alpha = 0.23
+Tc_K := 800.0
+T_amb := 300.0
+fr300 := 1.0 - pow(T_amb/Tc_K, 1.7)
+Ms0 := Ms300 / fr300
+Kz0 := Kz300 / pow(fr300, 3.0)
+Msat = Ms300
+Aex = 3e-11
+Ku1 = Kz300
+AnisU = vector(0, 0, 1)
+FixedLayer = vector(0, 1, 0)
+Pol = ThetaDL
+EpsilonPrime = 0.05
+Lambda = 1
+DisableZhangLiTorque = true
+FreeLayerThickness = 1e-9
+Hx := Hx_mT * 1e-3
+B_ext = vector(Hx, 0, 0)
+tp := tp_ps * 1e-12
+if RunDynamics == 1 {
+	CaseName = "dynamics"
+}
+stp := 0.2e-12
+t0p := 4 * tp
+rho_e := 81e-8
+C_vol := 2.6e6
+G_int := 170e6
+d_stack := 16e-9
+tau_cool := C_vol * d_stack / G_int
+J_cur := 0.0
+Tdev := 0.0
+SetSolver(4)
+FixDt = 5e-14
+OutputFormat = OVF2_BINARY
+TableAutoSave(stp / 2)
+TableAdd(E_total)
+TableAddVar(J_cur+0.0, "J", "A/m2")
+TableAddVar(T_amb+Tdev, "T", "K")
+m = Uniform(0, 0, InitMz)
+J_cur = 0.0
+J = vector(0, 0, 0)
+relax()
+saveas(m, "m_initial")
+print("Case=", CaseName, " I_sign=", I_sign, " InitMz=", InitMz, " Hx(mT)=", Hx_mT)
+//Case= switch  I_sign= 1  InitMz= 1  Hx(mT)= 160
+print("relax mz =", m.average().Z())
+//relax mz = 0.9809783697128296
+J = vector(0, 0, -I_sign*Jp*4/((exp(1.763*(t-t0p)/tp)+exp(-1.763*(t-t0p)/tp))*(exp(1.763*(t-t0p)/tp)+exp(-1.763*(t-t0p)/tp))))
+tprev := 0.0
+for ti := 0.0; ti < 8*tp+stp; ti += stp {
+	tb := t
+	ex := exp(1.763 * (tb - t0p) / tp)
+	s2 := 4 / ((ex + 1/ex) * (ex + 1/ex))
+	J_cur = -I_sign * Jp * s2
+	dtr := tb - tprev
+	if Heating == 1 {
+		decay := exp(-dtr / tau_cool)
+		src := rho_e * J_cur * J_cur / C_vol
+		Tdev = Tdev*decay + src*tau_cool*(1.0-decay)
+		T_now := T_amb + Tdev
+		fr := 1.0 - pow(T_now/Tc_K, 1.7)
+		fr = 0.5 * (fr + abs(fr))
+		Msat = Ms0 * fr
+		Ku1 = Kz0 * pow(fr, 3.0)
+	}
+	if Noise == 1 {
+		Temp = T_amb + Tdev
+	}
+	tprev = tb
+	run(stp)
+}
+J = vector(0, 0, 0)
+J_cur = 0.0
+dtrun := 10e-12
+nfree := t_free / dtrun
+for k := 0; k < nfree; k++ {
+	tb := t
+	dtr := tb - tprev
+	if Heating == 1 {
+		decay := exp(-dtr / tau_cool)
+		Tdev = Tdev * decay
+		T_now := T_amb + Tdev
+		fr := 1.0 - pow(T_now/Tc_K, 1.7)
+		fr = 0.5 * (fr + abs(fr))
+		Msat = Ms0 * fr
+		Ku1 = Kz0 * pow(fr, 3.0)
+	}
+	if Noise == 1 {
+		Temp = T_amb + Tdev
+	}
+	tprev = tb
+	run(dtrun)
+}
+saveas(m, "m_final")
+mzavg := m.average().Z()
+print("mz after pulse =", mzavg)
+//mz after pulse = -0.9809783697128296
+if RunDynamics == 0 {
+	if InitMz*mzavg < -0.5 {
+		print("result: switched")
+	} else {
+		print("result: NOT switched (raise Jp / ThetaDL, check Hx / I_sign)")
+	}
+}
+//result: switched
+//********************************************************************//
+//Please cite the following references, relevant for your simulation. //
+//See bibtex file in output folder for justification.                 //
+//********************************************************************//
+//   * Vansteenkiste et al., AIP Adv. 4, 107133 (2014).
