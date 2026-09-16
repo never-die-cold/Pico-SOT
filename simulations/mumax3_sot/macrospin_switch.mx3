@@ -152,7 +152,7 @@ for ti := 0.0; ti < 8*tp + stp; ti += stp {
 // ------------------------------ free evolution ------------------------------
 J = vector(0, 0, 0)
 J_cur = 0.0
-dtrun := 10e-12
+dtrun := stp
 nfree := t_free/dtrun
 for k := 0; k < nfree; k++ {
     tb := t
