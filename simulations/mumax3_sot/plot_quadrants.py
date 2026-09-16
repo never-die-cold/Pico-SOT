@@ -27,10 +27,10 @@ plt.rcParams["font.sans-serif"] = ["Microsoft YaHei", "SimHei", "DejaVu Sans"]
 plt.rcParams["axes.unicode_minus"] = False
 
 CASES = [
-    ("q1_Hxp_Ip",  "(a) q1  Hx>0, I>0  (平行)"),
-    ("q2_Hxm_Ip",  "(b) q2  Hx<0, I>0  (反平行)"),
-    ("q3_Hxp_Im",  "(c) q3  Hx>0, I<0  (反平行)"),
-    ("q4_Hxm_Im",  "(d) q4  Hx<0, I<0  (平行)"),
+    ("si_q1_Hxp_Ip",  "(a) q1  Hx>0, I>0  (平行)"),
+    ("si_q2_Hxm_Ip",  "(b) q2  Hx<0, I>0  (反平行)"),
+    ("si_q3_Hxp_Im",  "(c) q3  Hx>0, I<0  (反平行)"),
+    ("si_q4_Hxm_Im",  "(d) q4  Hx<0, I<0  (平行)"),
 ]
 
 

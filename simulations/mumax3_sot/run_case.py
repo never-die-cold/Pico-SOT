@@ -74,6 +74,9 @@ def main():
     ap.add_argument("--mumax", default=MUMAX)
     ap.add_argument("--force", action="store_true", help="overwrite existing case dir")
     ap.add_argument("--no-run", action="store_true", help="only write the script")
+    ap.add_argument("--model", default="si",
+                    help="model tag stored in summary.csv ('si' = SI parameters, "
+                         "'legacy' = pre-SI guessed parameters)")
     args = ap.parse_args()
 
     root = os.path.dirname(os.path.abspath(args.template))
@@ -115,6 +118,7 @@ def main():
     t_end, mz, tmax, t_cross, recov, mz0 = read_table(table)
 
     row = {"tag": args.tag, "time": datetime.datetime.now().isoformat(timespec="seconds"),
+           "model": args.model,
            "t_end_ps": "%.1f" % (t_end * 1e12), "mz_final": "%.4f" % mz,
            "switched": int(mz * mz0 < -0.5), "Tmax_K": "%.0f" % tmax,
            "t_cross_ps": "" if t_cross != t_cross else "%.1f" % (t_cross * 1e12),

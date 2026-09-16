@@ -29,11 +29,11 @@ plt.rcParams["axes.unicode_minus"] = False
 
 GROUPS = [
     ("平行  (Hx$\\cdot$I > 0)", "crimson",
-     [("a_f4_Hxp160_Ip", "-"), ("a_f4_Hxm160_Im", "--")]),
+     [("si_a_f4_Hxp160_Ip", "-"), ("si_a_f4_Hxm160_Im", "--")]),
     ("反平行  (Hx$\\cdot$I < 0)", "tab:blue",
-     [("a_f4_Hxp160_Im", "-"), ("a_f4_Hxm160_Ip", "--")]),
+     [("si_a_f4_Hxp160_Im", "-"), ("si_a_f4_Hxm160_Ip", "--")]),
     ("无 Hx", "0.25",
-     [("a_f4_Hx0_Ip", "-"), ("a_f4_Hx0_Im", "--")]),
+     [("si_a_f4_Hx0_Ip", "-"), ("si_a_f4_Hx0_Im", "--")]),
 ]
 
 
@@ -92,13 +92,13 @@ def main():
                  title_fontsize=7.5)
 
     # right panel: heating and current pulse (identical for all six runs)
-    c = load_table(os.path.join(args.runs, "a_f4_Hx0_Ip", "out", "table.txt"))
+    c = load_table(os.path.join(args.runs, "si_a_f4_Hx0_Ip", "out", "table.txt"))
     ax[1].plot(t_ref, c["T"] - 300.0, color="crimson", lw=1.4, label=r"$\Delta T$ (K)")
     ax[1].set_xlabel("delay (ps)")
     ax[1].set_ylabel(r"$\Delta T$ (K)", color="crimson")
     ax[1].tick_params(axis="y", colors="crimson")
     ax[1].set_xlim(0, 425)
-    ax[1].set_ylim(-2, 25)
+    ax[1].set_ylim(-2, 20)
     axt = ax[1].twinx()
     axt.plot(t_ref, c["J"] / 4e12, color="0.35", lw=1.0, ls=":",
              label=r"$J/J_p$")
@@ -108,7 +108,7 @@ def main():
     h1, l1 = ax[1].get_legend_handles_labels()
     h2, l2 = axt.get_legend_handles_labels()
     ax[1].legend(h1 + h2, l1 + l2, fontsize=8, loc="upper right")
-    ax[1].annotate("echo at 29 ps (t0+ted)", xy=(29, 19), xytext=(75, 15),
+    ax[1].annotate("echo at 29 ps (t0+ted)", xy=(29, 14), xytext=(75, 11),
                    fontsize=8, color="0.35",
                    arrowprops=dict(arrowstyle="->", color="0.35", lw=0.8))
 

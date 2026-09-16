@@ -1,19 +1,24 @@
-"""Final phase-diagram plots from runs/summary.csv (Jp, Tmax) switching map.
+"""Final switching-threshold plots from runs/summary.csv (SI-parameter model).
+
+With the SI heat channel the peak temperature is fixed by the current,
+Tmax = 300 + 50.4 K (Jp/6e12)^2, so the old 2D (Jp, Tmax) phase map
+collapses into 1D threshold curves.  This script plots:
+
+    phase_map.png    mz_final vs Jp for the four series
+                     (theta_DL = 0.2/0.3 x heating on/off)
+    phase_traces.png mz(t) and T(t) around the theta=0.2 heated boundary
+    phase_speed.png  crossing time vs Jp (switched cases)
+
+B2/B3-style controls (theta~0, Kz frozen) and Hx=0 symmetry checks are
+excluded; they live in mechanism_compare.png.
 
 Usage:
     python plot_phase.py [--summary runs/summary.csv] [--outdir runs]
-
-Outputs:
-    runs/phase_map.png      Jp vs Tmax scatter + boundary guide
-    runs/phase_traces.png   mz(t) and T(t) of the boundary cases
-    runs/phase_speed.png    crossing time vs Jp, final mz vs Tmax
-
-B2 (theta~0) and B3 (no Ku(T)) cases are excluded; C0 (heating off) points
-stay on the T=300 K line and C2 (Hx=0) is shown separately as a control.
 """
 import argparse
 import csv
 import os
+import re
 import sys
 
 import numpy as np
@@ -21,36 +26,37 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+plt.rcParams["font.sans-serif"] = ["Microsoft YaHei", "SimHei", "DejaVu Sans"]
+plt.rcParams["axes.unicode_minus"] = False
+
+SERIES = {  # tag pattern -> (label, color, linestyle)
+    ("0.2", "1"): ("$\\theta_{DL}$=0.2, heating on", "crimson", "-"),
+    ("0.2", "0"): ("$\\theta_{DL}$=0.2, heating off", "tab:blue", "-"),
+    ("0.3", "1"): ("$\\theta_{DL}$=0.3, heating on", "darkorange", "--"),
+    ("0.3", "0"): ("$\\theta_{DL}$=0.3, heating off", "tab:green", "--"),
+}
+
 
 def load_points(summary):
     pts = []
+    pat = re.compile(r"^si_(h|noh)_t(\d+)_Jp(\d+)$")
     with open(summary, newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
-            if not row.get("Jp") or not row.get("dT_ref"):
+            if row.get("model") != "si":
                 continue
-            if row["tag"].startswith("b0c_"):
+            m = pat.match(row["tag"])
+            if not m:
                 continue
-            pol = row.get("Pol") or ""
-            if pol and float(pol) < 0.05:
-                continue
-            kuexp = row.get("KuExp") or ""
-            if kuexp and float(kuexp) == 0.0:
-                continue
-            mz = float(row["mz_final"])
-            hx = row.get("Hx") or row.get("Hx_mT") or ""
             pts.append({
                 "tag": row["tag"],
+                "heat": 1 if m.group(1) == "h" else 0,
+                "theta": "0." + m.group(2)[0],  # 20 -> 0.2, 30 -> 0.3
                 "Jp": float(row["Jp"]),
-                "dT": float(row["dT_ref"]),
                 "Tmax": float(row["Tmax_K"]),
-                "mz": mz,
+                "mz": float(row["mz_final"]),
                 "t_cross": float(row["t_cross_ps"]) if row["t_cross_ps"] else np.nan,
-                "heating": int(row.get("Heating") or 1),
-                # Hx=0 is a symmetry-control case, not a point on the
-                # (Jp, Tmax) switching boundary
-                "Hx": float(hx) if hx else None,
             })
-    assert pts, "no phase points found"
+    assert pts, "no si_ threshold points found"
     return pts
 
 
@@ -73,47 +79,35 @@ def style(ax):
 
 
 def fig_map(pts, out):
-    fig, ax = plt.subplots(figsize=(5.6, 4.2), constrained_layout=True)
-    for p in pts:
-        if p["Hx"] == 0:
-            ax.scatter(p["Jp"] / 1e12, p["Tmax"], s=48, facecolors="none",
-                       edgecolors="gray", marker="D", lw=1.4, zorder=3)
+    fig, ax = plt.subplots(figsize=(6.4, 4.2), constrained_layout=True)
+    # Tmax scale as a secondary y-axis for the heated series
+    for key, (label, color, ls) in SERIES.items():
+        th, heat = key
+        g = sorted([p for p in pts if p["theta"] == th and p["heat"] == int(heat)],
+                   key=lambda p: p["Jp"])
+        if not g:
             continue
-        c = "crimson" if p["mz"] <= -0.9 else ("darkorange" if p["mz"] < 0 else "tab:blue")
-        m = "o" if p["mz"] <= -0.9 else ("^" if p["mz"] < 0 else "s")
-        filled = p["mz"] < 0
-        ax.scatter(p["Jp"] / 1e12, p["Tmax"], s=42, facecolors=c if filled else "none",
-                   edgecolors=c, marker=m, lw=1.4, zorder=3)
-    # eye-guide through the measured boundary midpoints
-    gx = [10.5, 9.5, 8.0, 7.0, 6.0]
-    gy = [583, 583, 619, 700, 810]
-    ax.plot(gx, gy, "k--", lw=1.0, alpha=0.6, label="switching boundary (guide)")
-    ax.axhline(800, color="gray", ls=":", lw=0.8)
-    ax.text(6.05, 806, r"$T_c\approx800$ K", fontsize=8, color="gray")
-    ax.scatter([], [], color="crimson", marker="o", label="switched")
-    ax.scatter([], [], color="darkorange", marker="^", label="partial")
-    ax.scatter([], [], facecolors="none", edgecolors="tab:blue", marker="s", label="not switched")
-    ax.scatter([], [], facecolors="none", edgecolors="gray", marker="D",
-               label="Hx=0 control (no flip)")
-    if any(p["Hx"] == 0 for p in pts):
-        p = next(p for p in pts if p["Hx"] == 0)
-        ax.annotate("C2: Hx=0\nno flip", xy=(p["Jp"] / 1e12, p["Tmax"]),
-                    xytext=(p["Jp"] / 1e12 + 0.6, p["Tmax"] - 65),
-                    fontsize=8, color="gray",
-                    arrowprops=dict(arrowstyle="->", color="gray", lw=0.8))
+        x = [p["Jp"] / 1e12 for p in g]
+        y = [p["mz"] for p in g]
+        ax.plot(x, y, ls, color=color, lw=1.4, marker="o", ms=3.5,
+                label=label)
+    ax.axhline(0, color="k", lw=0.6, alpha=0.5)
+    ax.axhline(-0.5, color="k", ls="--", lw=0.7, alpha=0.5)
+    ax.text(6.1, -0.42, "switch criterion", fontsize=7, color="0.35")
     ax.set_xlabel(r"$J_p$ ($10^{12}$ A/m$^2$)")
-    ax.set_ylabel(r"$T_{max}$ (K)")
-    ax.set_title("Switching phase map (6 ps sech$^2$)")
-    ax.legend(fontsize=8, loc="lower right")
+    ax.set_ylabel("final $m_z$")
+    ax.set_title("Switching threshold, 6 ps sech$^2$ pulse, Hx=160 mT\n"
+                 "SI model: $T_{max}$ = 300 + 50.4 K ($J_p$/6e12)$^2$")
+    ax.legend(fontsize=7.5, loc="lower left")
     style(ax)
     fig.savefig(out, dpi=200)
     print("saved:", out)
 
 
 def fig_traces(tags, out):
-    refs = ["b1_Jp8_dT300", "b1_Jp8_dT450"]
     fig, ax = plt.subplots(1, 2, figsize=(9.2, 3.3), constrained_layout=True)
-    for tag in refs + tags:
+    refs = ["si_h_t20_Jp9", "si_h_t20_Jp10"]
+    for tag in tags + refs:
         path = os.path.join(os.path.dirname(out), tag, "out", "table.txt")
         if not os.path.isfile(path):
             print("skip (missing):", path)
@@ -136,34 +130,34 @@ def fig_traces(tags, out):
     style(ax[0])
     ax[1].axhline(800, color="gray", ls=":", lw=0.8)
     ax[1].set_xlim(0, 160)
+    ax[1].set_ylim(280, 820)
     ax[1].set_xlabel("time (ps)")
     ax[1].set_ylabel("T (K)")
-    ax[1].set_title("T(t)  (gray = reference 8e12 cases)")
+    ax[1].set_title("T(t)  (SI heat channel)")
     style(ax[1])
     fig.savefig(out, dpi=200)
     print("saved:", out)
 
 
 def fig_speed(pts, out):
-    pts = [p for p in pts if p["Hx"] != 0]  # Hx=0 control is not a phase point
     fig, ax = plt.subplots(1, 2, figsize=(9.2, 3.4), constrained_layout=True)
-    groups = {}
-    for p in pts:
-        groups.setdefault(p["dT"], []).append(p)
-    for dT, g in sorted(groups.items()):
-        g = sorted(g, key=lambda p: p["Jp"])
-        jp = [p["Jp"] / 1e12 for p in g if p["t_cross"] == p["t_cross"]]
-        tc = [p["t_cross"] for p in g if p["t_cross"] == p["t_cross"]]
-        ax[0].plot(jp, tc, "o-", ms=4, lw=1.1, label="dT=%.0f K" % dT)
-        jpn = [p["Jp"] / 1e12 for p in g if p["t_cross"] != p["t_cross"]]
-        ax[0].scatter(jpn, [20] * len(jpn), marker="x", s=40)
+    for key, (label, color, ls) in SERIES.items():
+        th, heat = key
+        g = sorted([p for p in pts if p["theta"] == th and p["heat"] == int(heat)
+                    and p["t_cross"] == p["t_cross"] and p["mz"] < -0.5],
+                   key=lambda p: p["Jp"])
+        if not g:
+            continue
+        ax[0].plot([p["Jp"] / 1e12 for p in g], [p["t_cross"] for p in g],
+                   ls, marker="o", ms=4, lw=1.1, color=color, label=label)
     ax[0].set_xlabel(r"$J_p$ ($10^{12}$ A/m$^2$)")
     ax[0].set_ylabel(r"$t_{cross}$ (ps)")
-    ax[0].set_title("Crossing time (x = no crossing)")
+    ax[0].set_title("Crossing time (switched cases)")
     ax[0].legend(fontsize=7)
     style(ax[0])
     for p in pts:
-        ax[1].scatter(p["Jp"] / 1e12, p["mz"], s=36, c=[p["Tmax"]], cmap="inferno", vmin=300, vmax=900)
+        ax[1].scatter(p["Jp"] / 1e12, p["mz"], s=30, c=[p["Tmax"]], cmap="inferno",
+                      vmin=300, vmax=900)
     sm = plt.cm.ScalarMappable(cmap="inferno", norm=plt.Normalize(300, 900))
     fig.colorbar(sm, ax=ax[1], label=r"$T_{max}$ (K)")
     ax[1].axhline(-0.5, color="k", ls="--", lw=0.8)
@@ -182,13 +176,13 @@ def main():
     args = ap.parse_args()
 
     pts = load_points(args.summary)
-    for p in sorted(pts, key=lambda p: (p["Jp"], p["Tmax"])):
-        print("%-18s Jp=%.2fe12  Tmax=%4.0f K  mz=%+.4f  t_cross=%s"
-              % (p["tag"], p["Jp"] / 1e12, p["Tmax"], p["mz"],
+    for p in sorted(pts, key=lambda p: (p["theta"], p["heat"], p["Jp"])):
+        print("%-22s th=%s heat=%d  Jp=%.0fe12  Tmax=%4.0f K  mz=%+.4f  t_cross=%s"
+              % (p["tag"], p["theta"], p["heat"], p["Jp"] / 1e12, p["Tmax"], p["mz"],
                  "%.1f" % p["t_cross"] if p["t_cross"] == p["t_cross"] else "-"))
 
     fig_map(pts, os.path.join(args.outdir, "phase_map.png"))
-    fig_traces(["c1_Jp9_dT300", "c1_Jp8_dT375", "c1_Jp7_dT450", "c1_Jp6_dT600"],
+    fig_traces(["si_h_t20_Jp8", "si_h_t20_Jp11", "si_h_t20_Jp12", "si_h_t20_Jp15"],
                os.path.join(args.outdir, "phase_traces.png"))
     fig_speed(pts, os.path.join(args.outdir, "phase_speed.png"))
     return 0
