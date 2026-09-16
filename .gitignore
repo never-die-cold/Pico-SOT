@@ -5,6 +5,7 @@
 notes/*.md
 notes/extracted.txt
 !notes/error.md
+notes/NE_2020SI/
 
 # ---- mumax3 binary distribution (if placed at repo root) ----
 mumax3/
@@ -20,5 +21,4 @@ __pycache__/
 
 # ---- mumax3 per-run regenerated artifacts ----
 references.bib
-*.out/m[0-9]*.ovf
-runs/**/out/m[0-9]*.ovf
+m[0-9]*.ovf
