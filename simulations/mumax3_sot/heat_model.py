@@ -1,4 +1,4 @@
-"""Replica of the thermal model of Jhuria et al. (NE 2020) Supplementary Note 3.2.
+"""Replica of the thermal model of Jhuria et al. (NE 2020).
 
 Solves the 1D heat-diffusion equation across the 16 nm metallic stack,
 
@@ -7,12 +7,11 @@ Solves the 1D heat-diffusion equation across the 16 nm metallic stack,
 with an adiabatic top surface and an interfacial thermal conductance G_int
 at the film/substrate boundary (heat flux G_int*T).  This is the physical
 model the paper used to produce the temperatures that feed their macrospin
-LLG simulation (Ms(T), Kz(T)); the legacy macros of this repo instead used a
-free 0D knob dT_ref.  Here we compute T(t) at the Co layer and calibrate an
-equivalent 0D low-pass channel (used by the .mx3 scripts) against the FD
-solution.
+LLG simulation (Ms(T), Kz(T)).  Here we compute T(t) at the Co layer and
+calibrate an equivalent 0D low-pass channel (used by the .mx3 scripts)
+against the FD solution.
 
-Parameters (Supplementary Table 1):
+Parameters (paper):
     C      = 2.6e6 J m-3 K-1   (weighted average of the stack)
     Lambda = 9 W m-1 K-1       (Wiedemann-Franz)
     G_int  = 170e6 W m-2 K-1   (sapphire; 100e6 for glass)
@@ -20,7 +19,7 @@ Parameters (Supplementary Table 1):
     d      = 16 nm
 
 Outputs:
-    runs/heat_model.png        FD T_Co(t) for several Jp + legacy comparison
+    runs/heat_model.png        FD T_Co(t) for several Jp + 0D channel comparison
     stdout                     calibration numbers (peak, tau, ODE error)
 
 Usage:
@@ -34,7 +33,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-# ---------------------------------------------------------------- SI constants
+# ------------------------------------------------------------------- constants
 C_VOL = 2.6e6        # J/m3/K
 LAMBDA = 9.0         # W/m/K
 G_INT = 170e6        # W/m2/K  (sapphire substrate)
@@ -152,38 +151,25 @@ def main():
     tt = t * 1e12
     for jp in (4e12, 6e12, 8e12, 1.2e13, 2e13):
         Tp = T_AMB + T_co * jp**2
-        ax[0].plot(tt, Tp, lw=1.2, label="J=%.0fe12" % (jp / 1e12))
+        ax[0].plot(tt, Tp, lw=1.2, label=r"$J_p$=%.0f$\times10^{12}$ A/m$^2$" % (jp / 1e12))
     ax[0].axhline(TC, color="gray", ls=":", lw=0.8)
     ax[0].text(0.02, 0.03, r"$T_c=800$ K", transform=ax[0].transAxes,
                fontsize=8, color="gray")
     ax[0].set_xlim(0, 200)
     ax[0].set_xlabel("time (ps)")
     ax[0].set_ylabel(r"$T_{Co}$ (K)")
-    ax[0].set_title("SI heat-diffusion model (1D FD)")
+    ax[0].set_title("heat-diffusion model (1D FD, paper)")
     ax[0].legend(fontsize=7)
     ax[0].grid(alpha=0.25, lw=0.5)
 
     ax[1].plot(tt, T_AMB + T_co * (6e12) ** 2, "k-", lw=1.4,
-               label="FD (SI physics)")
+               label="FD (paper model)")
     ax[1].plot(tt, T_AMB + T_ode[: nt], "--", lw=1.4, color="tab:red",
                label=r"0D ODE ($\tau$=C d/G)")
-    # legacy knob (pre-SI): 0D channel of (J/J_ref)^2 with dT_ref=300 K, tau=100 ps
-    tau_l = 100e-12
-    dT_ref = 300.0
-    Hp = 0.756 * TP / tau_l          # legacy normalisation of the sech^4 source
-    h = 0.0
-    legacy = np.zeros(nt)
-    decay = math.exp(-dt / tau_l)
-    for i in range(nt):
-        q = (shape[i]) ** 2          # J = J_ref -> source sech^4, peak 1
-        h = h * decay + q * (1.0 - decay)
-        legacy[i] = T_AMB + dT_ref * h / Hp
-    ax[1].plot(tt, legacy, ":", lw=1.2, color="gray",
-               label="legacy knob (dT=300 K, 100 ps)")
     ax[1].set_xlim(0, 200)
     ax[1].set_xlabel("time (ps)")
     ax[1].set_ylabel(r"$T_{Co}$ (K)")
-    ax[1].set_title("J = 6e12 A/m$^2$, 6 ps sech$^2$")
+    ax[1].set_title(r"$J_p$ = 6$\times10^{12}$ A/m$^2$, 6 ps sech$^2$")
     ax[1].legend(fontsize=7)
     ax[1].grid(alpha=0.25, lw=0.5)
     out = os.path.join(OUTDIR, "heat_model.png")

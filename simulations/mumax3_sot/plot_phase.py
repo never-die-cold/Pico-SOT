@@ -1,6 +1,6 @@
-"""Final switching-threshold plots from runs/summary.csv (SI-parameter model).
+"""Final switching-threshold plots from runs/summary.csv (paper-parameter model).
 
-With the SI heat channel the peak temperature is fixed by the current,
+With the paper heat channel the peak temperature is fixed by the current,
 Tmax = 300 + 50.4 K (Jp/6e12)^2, so the old 2D (Jp, Tmax) phase map
 collapses into 1D threshold curves.  This script plots:
 
@@ -42,6 +42,18 @@ SERIES = {  # tag pattern -> (label, color, linestyle)
     ("0.3", "0"): ("$\\theta_{DL}$=0.3, heating off", "tab:green", "--"),
 }
 
+TRACE_ORDER = ["si_h_t20_Jp8", "si_h_t20_Jp9", "si_h_t20_Jp10",
+               "si_h_t20_Jp11", "si_h_t20_Jp12", "si_h_t20_Jp15"]
+
+TRACE_STYLE = {  # tag -> (color, outcome at the end of the 0.4 ns table)
+    "si_h_t20_Jp8": ("#1f77b4", "no switch"),
+    "si_h_t20_Jp9": ("#ff7f0e", "no switch"),
+    "si_h_t20_Jp10": ("#2ca02c", "switches"),
+    "si_h_t20_Jp11": ("#d62728", "switches"),
+    "si_h_t20_Jp12": ("#9467bd", "switches"),
+    "si_h_t20_Jp15": ("#8c564b", "recovers"),
+}
+
 
 def ovf_uniformity(runs_root, tag):
     """|average m| from m_final.ovf: 1 for a uniform state, <<1 for multidomain."""
@@ -69,8 +81,6 @@ def load_points(summary):
     best = {}
     with open(summary, newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
-            if row.get("model") != "si":
-                continue
             m = pat.match(row.get("tag", ""))
             if not m:
                 continue
@@ -140,17 +150,16 @@ def fig_map(pts, out):
     ax.set_xlabel(r"$J_p$ ($10^{12}$ A/m$^2$)")
     ax.set_ylabel("final $m_z$")
     ax.set_title("Switching threshold, 6 ps sech$^2$ pulse, Hx=160 mT\n"
-                 "SI model: $T_{max}$ = 300 + 50.4 K ($J_p$/6e12)$^2$")
+                 "heating model: $T_{max}$ = 300 + 50.4 K ($J_p$/6×10¹²)$^2$")
     ax.legend(fontsize=7, loc="lower left")
     style(ax)
     fig.savefig(out, dpi=200)
     print("saved:", out)
 
 
-def fig_traces(tags, out):
+def fig_traces(out):
     fig, ax = plt.subplots(1, 2, figsize=(9.2, 3.3), constrained_layout=True)
-    refs = ["si_h_t20_Jp9", "si_h_t20_Jp10"]
-    for tag in tags + refs:
+    for tag in TRACE_ORDER:
         path = os.path.join(os.path.dirname(out), tag, "out", "table.txt")
         if not os.path.isfile(path):
             print("skip (missing):", path)
@@ -158,26 +167,28 @@ def fig_traces(tags, out):
         c = load_table(path)
         t = c["t"] * 1e12
         mz = c["mz"]
-        col = "tab:blue" if mz[-1] > 0 else "crimson"
-        if tag in refs:
-            col = "gray"
-        ax[0].plot(t, mz, lw=1.1, color=col, label=tag)
-        ax[1].plot(t, c["T"], lw=1.1, color=col)
+        col, outcome = TRACE_STYLE[tag]
+        jp = re.search(r"Jp(\d+)", tag).group(1)
+        ax[0].plot(t, mz, lw=1.2, color=col,
+                   label="$J_p$=%s: %s" % (jp, outcome))
+        ax[1].plot(t, c["T"], lw=1.2, color=col)
     ax[0].axhline(0, color="k", lw=0.5, alpha=0.5)
     ax[0].axvline(24, color="k", lw=0.5, alpha=0.2)
     ax[0].set_xlim(0, 160)
     ax[0].set_xlabel("time (ps)")
     ax[0].set_ylabel("average mz")
     ax[0].set_title("Boundary cases: mz(t)")
-    ax[0].legend(fontsize=6.5, loc="lower right")
     style(ax[0])
     ax[1].axhline(800, color="gray", ls=":", lw=0.8)
     ax[1].set_xlim(0, 160)
     ax[1].set_ylim(280, 820)
     ax[1].set_xlabel("time (ps)")
     ax[1].set_ylabel("T (K)")
-    ax[1].set_title("T(t)  (SI heat channel)")
+    ax[1].set_title("T(t)  (heat channel)")
     style(ax[1])
+    h, lab = ax[0].get_legend_handles_labels()
+    fig.legend(h, lab, loc="outside upper center", ncol=6, fontsize=7.5,
+               frameon=False, columnspacing=1.2, handlelength=1.8)
     fig.savefig(out, dpi=200)
     print("saved:", out)
 
@@ -187,15 +198,21 @@ def fig_speed(pts, out):
     for key, (label, color, ls) in SERIES.items():
         th, heat = key
         g = sorted([p for p in pts if p["theta"] == th and p["heat"] == int(heat)
-                    and p["t_cross"] == p["t_cross"] and p["mz"] < -0.5],
-                   key=lambda p: p["Jp"])
+                    and p["t_cross"] == p["t_cross"] and p["mz"] < -0.5
+                    and p["Tmax"] <= 800.0], key=lambda p: p["Jp"])
         if not g:
             continue
         ax[0].plot([p["Jp"] / 1e12 for p in g], [p["t_cross"] for p in g],
                    ls, marker="o", ms=4, lw=1.1, color=color, label=label)
+    hot = sorted([p for p in pts if p["t_cross"] == p["t_cross"] and p["mz"] < -0.5
+                  and p["Tmax"] > 800.0], key=lambda p: p["Jp"])
+    if hot:  # T > Tc: film demagnetizes (Msat = 0); t_cross is the cooling time
+        ax[0].plot([p["Jp"] / 1e12 for p in hot], [p["t_cross"] for p in hot], "x",
+                   color="0.45", ms=6, mew=1.3, ls="none",
+                   label="$T_{max}>T_c$ (excluded)")
     ax[0].set_xlabel(r"$J_p$ ($10^{12}$ A/m$^2$)")
     ax[0].set_ylabel(r"$t_{cross}$ (ps)")
-    ax[0].set_title("Crossing time (switched cases)")
+    ax[0].set_title("Crossing time (switched cases, $T_{max}\\,\\leq\\,T_c$)")
     ax[0].legend(fontsize=7)
     style(ax[0])
     for p in pts:
@@ -227,8 +244,7 @@ def main():
                  "%.3f%s" % (p["uni"], "" if p["uni"] >= 0.9 else " <- multidomain")))
 
     fig_map(pts, os.path.join(args.outdir, "phase_map.png"))
-    fig_traces(["si_h_t20_Jp8", "si_h_t20_Jp11", "si_h_t20_Jp12", "si_h_t20_Jp15"],
-               os.path.join(args.outdir, "phase_traces.png"))
+    fig_traces(os.path.join(args.outdir, "phase_traces.png"))
     fig_speed(pts, os.path.join(args.outdir, "phase_speed.png"))
     return 0
 

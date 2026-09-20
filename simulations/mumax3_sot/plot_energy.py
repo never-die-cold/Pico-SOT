@@ -20,12 +20,12 @@ from matplotlib.patches import Patch
 from energy_check import RHO, VSTACK, find_table, load_j
 
 CASES = [
-    ("si_noh_t20_Jp6",  "6e12\nno heat", "no"),
-    ("si_h_t20_Jp10",   "10e12\nSI heat", "yes"),
-    ("si_h_t20_Jp12",   "12e12\nSI heat", "yes"),
-    ("si_h_t20_Jp14",   "14e12\nSI heat", "yes"),
-    ("si_h_t20_Jp20",   "20e12\nSI heat", "over_tc"),
-    ("si_noh_t20_Jp20", "20e12\nno heat", "yes"),
+    ("si_noh_t20_Jp6",  "6×10¹²\nno heat", "no"),
+    ("si_h_t20_Jp10",   "10×10¹²\nheat", "yes"),
+    ("si_h_t20_Jp12",   "12×10¹²\nheat", "yes"),
+    ("si_h_t20_Jp14",   "14×10¹²\nheat", "yes"),
+    ("si_h_t20_Jp20",   "20×10¹²\nheat", "over_tc"),
+    ("si_noh_t20_Jp20", "20×10¹²\nno heat", "yes"),
 ]
 
 
