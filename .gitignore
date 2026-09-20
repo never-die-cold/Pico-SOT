@@ -15,6 +15,9 @@ gui
 Thumbs.db
 .DS_Store
 
+# ---- generated slide decks (rebuild with slides/build_ppt.py) ----
+*.pptx
+
 # ---- run data: local only (summary.csv, table/log/ovf, case scripts, figures) ----
 simulations/mumax3_sot/runs/
 simulations/mumax3_sot/fig3_switching.out/
