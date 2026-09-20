@@ -4,24 +4,21 @@
 // Paper: Jhuria et al., Nature Electronics 3, 680-686 (2020)
 //        doi:10.1038/s41928-020-00488-3
 //
-// SI REPLICA (2026-09): this script now follows the Supplementary Information
-// (Supplementary Note 3, Table S1) instead of the guessed legacy parameters:
+// PAPER REPLICA (2026-09): the model follows the paper
+// (LLG + SOT + heat diffusion):
 //   * Ms(300 K) = 1.0e6 A/m, B_K(300 K) = 0.8 T  (Kz = 1e6 J/m3), alpha = 0.23
 //   * Ms(T) = Ms(0)*[1-(T/Tc)^1.7], Kz(T) = Kz(0)*(Ms(T)/Ms(0))^3, Tc = 800 K
 //   * Ku1 = Kz (not Keff + mu0*Ms^2/2): matches H_z = 2Kz/(mu0 Ms) - Ms exactly
-//   * heating = 0D equivalent channel of the SI 1D heat-diffusion model
+//   * heating = 0D equivalent channel of the 1D heat-diffusion model
 //     (heat_model.py): C dT/dt = rho*J^2 - C*T/tau, tau = C*d/G_int.
-//     At 6e12 / 6 ps this gives +50 K peak (SI: ~60 K), NOT the legacy 300 K.
-//   * Pol = theta_DL (0.20 main-text fit; 0.30 in SI Fig. 3-5), EpsilonPrime =
+//     At 6e12 / 6 ps this gives +50 K peak (paper: ~60 K).
+//   * Pol = theta_DL (0.20 main-text fit; 0.30 for strong-current simulations), EpsilonPrime =
 //     theta_FL = 0.05, Lambda = 1.  Verified against cuda/slonczewski2.cu and
-//     the SI LLG: dm/dt|DL = gamma (hbar/2e) Pol J/(Ms t) m x (m x sigma).
-//
-// Legacy outputs used free knobs dT_ref=300-600 K and tau_cool=100 ps and are
-// kept as model=legacy in runs/summary.csv; new runs should use model=si.
+//     the LLG: dm/dt|DL = gamma (hbar/2e) Pol J/(Ms t) m x (m x sigma).
 //
 // Use with run_case.py, e.g.:
-//   python run_case.py macrospin_switch.mx3 si_b1_Jp6 --set Jp=6e12
-//   python run_case.py macrospin_switch.mx3 si_c0_noh_8e12 --set Jp=8e12 Heating=0
+//   python run_case.py macrospin_switch.mx3 si_h_Jp6 --set Jp=6e12
+//   python run_case.py macrospin_switch.mx3 si_noh_Jp8 --set Jp=8e12 Heating=0
 //   python run_case.py macrospin_switch.mx3 si_pw20 --set tp_ps=20
 // ============================================================================
 
@@ -32,11 +29,11 @@ I_sign  := 1         // current polarity (paper convention): +1 or -1
 InitMz  := 1         // initial state: +1 (up) or -1 (down)
 Hx_mT   := 160       // in-plane bias field (mT)
 Jp      := 6e12      // peak current density (A/m^2)
-Heating := 1         // 1: SI heat channel; 0: frozen 300 K
+Heating := 1         // 1: heat channel; 0: frozen 300 K
 Noise   := 0         // 1: Langevin noise at T_now; 0: deterministic
-ScaleMs := 1         // 1: Ms(T) per SI; 0: freeze Ms at 300 K
-ScaleKz := 1         // 1: Kz(T) per SI; 0: freeze Kz at 300 K
-ThetaDL := 0.20      // spin Hall angle (0.20 fit; 0.30 in SI Fig. 3-5)
+ScaleMs := 1         // 1: Ms(T) per paper; 0: freeze Ms at 300 K
+ScaleKz := 1         // 1: Kz(T) per paper; 0: freeze Kz at 300 K
+ThetaDL := 0.20      // spin Hall angle (0.20 fit; 0.30 for strong-current simulations)
 tp_ps   := 6.0       // pulse FWHM (ps); dynamics mode typically 3.7
 t_free  := 400e-12   // free evolution after the pulse (s)
 // ============================================================================
@@ -47,11 +44,11 @@ Ny := 64
 SetGridSize(Nx, Ny, 1)
 SetCellSize(5e-9, 5e-9, 1e-9)
 
-// ------------------- SI material parameters (Table S1) ----------------------
+// ------------------------ material parameters (paper) -----------------------
 Ms300  := 1.0e6                  // A/m at 300 K (VSM)
 BK300  := 0.8                    // T, PMA anisotropy field at 300 K (fit)
 Kz300  := 0.5*Ms300*(BK300 + mu0*Ms300)  // = 1.03e6 J/m3 (2Kz/Ms - mu0 Ms = BK)
-alpha  = 0.23                    // effective damping (SI fit from TR-MOKE)
+alpha  = 0.23                    // effective damping (paper fit from TR-MOKE)
 Tc_K   := 800.0                  // K
 T_amb  := 300.0                  // K
 fr300  := 1.0 - pow(T_amb/Tc_K, 1.7)
@@ -82,10 +79,10 @@ if RunDynamics == 1 {
 stp := 0.2e-12
 t0p := 4*tp                      // pulse centre (s)
 
-// --------------- SI heat channel (heat_model.py calibration) ----------------
-rho_e    := 81e-8                // Ohm m (SI four-point measurement)
-C_vol    := 2.6e6                // J/m3/K (SI weighted average)
-G_int    := 170e6                // W/m2/K (SI fit, sapphire)
+// --------------- heat channel (heat_model.py calibration) -------------------
+rho_e    := 81e-8                // Ohm m (four-point measurement)
+C_vol    := 2.6e6                // J/m3/K (weighted average)
+G_int    := 170e6                // W/m2/K (fit, sapphire)
 d_stack  := 16e-9                // m
 tau_cool := C_vol*d_stack/G_int  // 245 ps = C*d/G
 

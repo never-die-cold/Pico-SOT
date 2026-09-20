@@ -4,17 +4,16 @@
 //        picosecond electrical pulses", Nature Electronics 3, 680-686 (2020)
 //        doi:10.1038/s41928-020-00488-3
 //
-// SI REPLICA (2026-09): material and thermal parameters now follow the
-// Supplementary Information (Note 3, Table S1) instead of fitted knobs:
+// PAPER REPLICA (2026-09): material and thermal parameters follow the paper:
 //   Ms(300 K)=1.0e6 A/m, B_K(300 K)=0.8 T, alpha=0.23, Tc=800 K,
 //   Ms(T)=Ms(0)[1-(T/Tc)^1.7], Kz(T)=Kz(0)(Ms/Ms0)^3, Ku1 = Kz,
 //   heating: dT/dt = rho*J^2/C - (T-Troom)/tau,  tau = C*d/G = 245 ps
-//   (0D equivalent channel of the SI 1D heat-diffusion model, see
+//   (0D equivalent channel of the 1D heat-diffusion model, see
 //   heat_model.py; at Jpk=4e12/3.7 ps the peak rise is ~14 K).
 //
 // mumax3 has NO native spin-orbit-torque input. It is emulated exactly with
 // the Slonczewski module (verified against the mumax3 kernel source and the
-// SI LLG):
+// LLG):
 //     dm/dt|DL = gamma * (hbar/2e) * Pol * J / (Ms*t) * (m x (m x sigma))
 //   -> set Pol = theta_DL, Lambda = 1, EpsilonPrime = theta_FL,
 //      FixedLayer = sigma (spin polarization direction),
@@ -29,9 +28,9 @@ SetGridSize(64, 64, 1)
 SetCellSize(16e-9, 16e-9, 1e-9)
 SetPBC(16, 16, 0)          // periodic in-plane -> uniform film demag
 
-// ---------------- material (SI Table S1) ----------------
+// -------------------- material (paper) -------------------
 Ms300  := 1.0e6                        // A/m at 300 K (VSM)
-BK300  := 0.8                          // T, PMA field at 300 K (SI fit)
+BK300  := 0.8                          // T, PMA field at 300 K (paper fit)
 Kz300  := 0.5*Ms300*(BK300 + mu0*Ms300)
 Troom  := 300.0
 Tc     := 800.0
@@ -58,7 +57,7 @@ Hx    := 160e-3                       // T
 Isign := 1.0                          // +1: (Hx+, I+) -> -Mz  (paper Fig. 3)
 B_ext  = vector(Hx, 0, 0)
 
-// ---------------- pulse + SI Joule heating ----------------
+// ---------------- pulse + Joule heating --------------------
 Jpk  := 4.0e12                        // A/m^2, peak current density (low-power shot)
 tp   := 3.7e-12                       // pulse FWHM (3.7 ps TR-MOKE, 6 ps switching)
 t0   := 5e-12                         // pulse arrival time
@@ -66,10 +65,10 @@ echo := 0.0                           // electrical-reflection amplitude (paper:
 ted  := 24e-12                        // reflection delay
 ln2x4 := 2.772588722239781            // 4*ln2
 
-rho_e   := 81e-8                      // Ohm m (SI)
-C_vol   := 2.6e6                      // J/m3/K (SI)
+rho_e   := 81e-8                      // Ohm m (paper)
+C_vol   := 2.6e6                      // J/m3/K (paper)
 d_stack := 16e-9                      // m
-tauC    := C_vol*d_stack/170e6        // 245 ps (C*d/G_int, SI G=170 MW/m2K)
+tauC    := C_vol*d_stack/170e6        // 245 ps (C*d/G_int, G=170 MW/m2K)
 
 // ---------------- accurate, reproducible time stepping ----------------
 SetSolver(4)                          // classical RK4 with fixed step
@@ -107,13 +106,13 @@ for i := 0; i < niter; i++ {
 	tb      := t                                  // snapshot of actual time
 	Jcur     = Isign*Jpk*(exp(-ln2x4*pow((tb-t0)/tp, 2)) + echo*exp(-ln2x4*pow((tb-t0-ted)/tp, 2)))
 	dtr     := tb - tprev
-	heat    := rho_e*Jcur*Jcur/C_vol              // dT/dt source (K/s), SI q=rho J^2
+	heat    := rho_e*Jcur*Jcur/C_vol              // dT/dt source (K/s), q=rho J^2
 	Tcur     = (Tcur + heat*dtr + Troom*dtr/tauC)/(1 + dtr/tauC)
-	fr      := 1.0 - pow(Tcur/Tc, 1.7)            // SI Ms(T) law
+	fr      := 1.0 - pow(Tcur/Tc, 1.7)            // Ms(T) law
 	fr       = 0.5*(fr + abs(fr))                 // clamp at 0 (T >= Tc)
 	Ms_cur   = Ms0*fr
 	Msat     = Ms_cur
-	Ku1      = Kz0*pow(fr, 3.0)                   // SI Kz(T) = Kz(0)(Ms/Ms0)^3
+	Ku1      = Kz0*pow(fr, 3.0)                   // Kz(T) = Kz(0)(Ms/Ms0)^3
 	tprev    = tb
 	run(stp)
 }
