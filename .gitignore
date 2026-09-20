@@ -17,6 +17,7 @@ Thumbs.db
 
 # ---- generated slide decks (rebuild with slides/build_ppt.py) ----
 *.pptx
+!slides/PicoSOT_组会汇报.pptx
 
 # ---- run data: local only (summary.csv, table/log/ovf, case scripts, figures) ----
 simulations/mumax3_sot/runs/

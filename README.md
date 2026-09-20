@@ -70,7 +70,7 @@ requirements.txt                       # Python dependencies for post-processing
 slides/
 ├─ build_ppt.py                        # deck build script
 ├─ assets/device_stack.png             # device sketch
-└─ PicoSOT_组会汇报.pptx                # generated deck (local only, git-ignored)
+└─ PicoSOT_组会汇报.pptx                # group-meeting deck (build_ppt.py output)
 docs/
 ├─ RESULTS.md                          # full experiment log
 ├─ paper_replica.md                       # paper ↔ mumax3 mapping + heat-model calibration (zh)

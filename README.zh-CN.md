@@ -58,7 +58,7 @@ requirements.txt                       # 后处理脚本的 Python 依赖
 slides/
 ├─ build_ppt.py                        # 汇报 PPT 生成脚本
 ├─ assets/device_stack.png             # 器件示意图
-└─ PicoSOT_组会汇报.pptx                # 生成的讲稿（本地，不入库）
+└─ PicoSOT_组会汇报.pptx                # 组会汇报讲稿（build_ppt.py 生成）
 docs/
 ├─ RESULTS.md                          # 完整英文实验记录
 ├─ paper_replica.md                       # 论文 ↔ mumax3 逐项映射与热模型标定（中文）
