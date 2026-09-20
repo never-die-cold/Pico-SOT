@@ -19,7 +19,7 @@
       FD 偏差 5.1%）；`run_case.py` 加 `model` 列；纯 SOT/加热阈值、机制分解
       （ScaleKz/ScaleMs/θ≈0/Hx=0/噪声）、脉宽窗口、全器件四象限与器件阈值、
       定稿图全量刷新；旧结果标 `model=legacy`、旧图备份 `runs/legacy/`；
-      新增 `docs/si_replica.md`。
+      新增 `docs/paper_replica.md`。
 
 ---
 
@@ -84,7 +84,7 @@
   - 已有 θ=0.2/无加热 @10×10¹² 的窗口（12 ps 不翻、15 ps 起翻）；待补加热下
     6→30 ps 扫描与延迟/能量曲线，对照论文 Fig. 4d 与 SI Fig. 3
   - 验收：`docs/figures/` 新定稿图 + README/RESULTS 更新
-- [x] **P5（P2, S）SOT 等效性推导文档**（2026-09-16，并入 `docs/si_replica.md`）
+- [x] **P5（P2, S）SOT 等效性推导文档**（2026-09-16，并入 `docs/paper_replica.md`）
   - 已给出 Slonczewski 内核（ε=Pol/2、β=ħ/e）与 SI 的 θ<sub>DL</sub>·C<sub>s</sub> 的数值换算
     （有效因子 ≈Pol/(1+α²)=θ<sub>DL</sub>），含 DL 速率数值对照
 - [ ] **P6（P2, L）更真实物理（可选）**
@@ -96,7 +96,7 @@
   - 验收：`Jc(Hx)` 图 + 数据表
 - [ ] **P8（P1, S）脉冲波形/反射标定**
   - 绝对阈值比 SI 高 ~1.5×；扫描波形（sech² vs 高斯 vs 方波）与 echo 序列
-    （幅值/延迟），估计对 Jc 的影响区间，写回 `docs/si_replica.md` §4
+    （幅值/延迟），估计对 Jc 的影响区间，写回 `docs/paper_replica.md` §4
   - 验收：波形-阈值对照表
 
 ## D. 文档与传播

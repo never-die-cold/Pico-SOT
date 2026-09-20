@@ -4,60 +4,59 @@ Detailed record of the mumax3 replica of Jhuria et al., *"Spin-orbit torque swit
 of a ferromagnet with picosecond electrical pulses"*, Nature Electronics **3**, 680–686
 (2020), doi:10.1038/s41928-020-00488-3.
 
-All results below come from the corrected, time-exact scripts (`SetSolver(4)+FixDt` +
-real-time `J(t)`); see the historical note at the end.
+All results below come from the time-exact scripts (`SetSolver(4)+FixDt` + real-time `J(t)`).
 
 > **Data policy (2026-09-17):** raw run outputs (`simulations/mumax3_sot/runs/`)
-> are **local only** and git-ignored — the repository carries code, docs and the
-> final figures under `docs/figures/`. Paths like `runs/<tag>` below refer to the
-> local run archive.
+> are kept locally — the deliverable carries code, docs and the final figures
+> under `docs/figures/`. Paths like `runs/<tag>` below refer to the local run
+> archive.
 
-> **Status (2026-09-16):** sections 0.x are the current results, obtained with the
-> **SI-parameter model** (Supplementary Note 3 of the paper; see `docs/si_replica.md`).
-> Sections 1–8 further below are the **legacy** record (guessed parameters:
-> Ms=1.3×10⁶, Ha=1 T, alpha=0.15, free dT<sub>ref</sub> knob) kept for traceability; those
-> conclusions are superseded wherever they conflict with section 0.
+> **Status (2026-09-16):** results obtained with the **paper-parameter model**
+> (model and parameters taken from the paper; see `docs/paper_replica.md`).
 
-## 0. SI-parameter replica (2026-09-16) — current results
+## Paper-parameter replica (2026-09-16)
 
-The paper's own Supplementary Information (local copy: `notes/NE_2020SI/`) specifies
-the complete macrospin model. All three .mx3 templates were refactored to it
-(`model=si` in `runs/summary.csv`); the legacy runs are kept with `model=legacy`.
+The paper specifies
+the complete macrospin model. All three .mx3 templates follow it.
 
-### 0.1 Thermal model validation (`heat_model.py`)
+### 1. Thermal model validation (`heat_model.py`)
 
-* 1D FD solution of the SI heat equation (C=2.6×10⁶ J/m³K, Λ=9 W/mK, G=170 MW/m²K,
+* 1D FD solution of the paper's heat equation (C=2.6×10⁶ J/m³K, Λ=9 W/mK, G=170 MW/m²K,
   q=ρJ², adiabatic top): **peak Co rise +50.4 K at Jp=6×10¹² / 6 ps**, decay τ≈245 ps
   (=C·d/G). The paper states ~60 K average peak rise at 6×10¹² (incl. ~15 K
   electron–phonon non-equilibrium) → consistent.
 * The 0D channel used inside the .mx3 loops (`dT/dt = ρJ²/C − T/τ`) deviates from
   the FD solution by at most **5.1%** over 0–450 ps.
-* Consequence: `Tmax ≈ 300 + 50.4 K (Jp/6e12)²` is now fixed by physics; the legacy
-  free knob `dT_ref=300–600 K` (peak 583–867 K, i.e. ~6× too hot) is gone.
+* Consequence: `Tmax ≈ 300 + 50.4 K (Jp/6e12)²` is fixed by physics (no free knob).
 * Figure: `docs/figures/heat_model.png`.
 
-### 0.2 Switching thresholds (macrospin, 6 ps sech², Hx=160 mT)
+### 2. Switching thresholds (macrospin, 6 ps sech², Hx=160 mT)
 
 | series | threshold Jc (mz<sub>final</sub> < −0.5) | Tmax at threshold |
 |---|---|---|
-| θ<sub>DL</sub>=0.2, SI heating | (9, 10]×10¹² (switches from 10×10¹², t<sub>cross</sub> 68.3 ps) | (411,438] K |
+| θ<sub>DL</sub>=0.2, with heating | (9, 10]×10¹² (switches from 10×10¹², t<sub>cross</sub> 68.3 ps) | (411,438] K |
 | θ<sub>DL</sub>=0.2, heating off | 20×10¹² (19×10¹² → multidomain, excluded) | 300 K |
-| θ<sub>DL</sub>=0.3, SI heating | (8, 9]×10¹² | (388,411] K |
+| θ<sub>DL</sub>=0.3, with heating | (8, 9]×10¹² | (388,411] K |
 | θ<sub>DL</sub>=0.3, heating off | (12, 14]×10¹² (13×10¹² → multidomain, excluded) | 300 K |
 
 * **Pure SOT does switch without Joule heating** — at ~2× the heated threshold
   (θ=0.2: 20 vs 10×10¹², energy ratio 4×; θ=0.3: ~13.5 vs ~8.5×10¹², energy ratio ~2.3×).
-  This matches the paper's SI Fig. 3/4 statement (pure LLG 9×10¹² vs heated 6×10¹²,
+  This matches the ratio stated in the paper (pure LLG 9×10¹² vs heated 6×10¹²,
   energy ratio ~2×) **in ratio**; the absolute thresholds are ~1.5× higher here,
-  most plausibly from the unknown pulse waveform/reflection sequence in the SI.
+  most plausibly from the unknown pulse waveform/reflection sequence in the paper.
 * Non-monotonic precessional windows (uniform single domain, |⟨m⟩|=1.000): with
   heating, θ=0.2 does **not** switch at **15–17×10¹²** and θ=0.3 at **14–17×10¹²**
   (+0.98 recapture); switching recovers at **18×10¹²** and persists to 30×10¹²
-  (full scan; no further windows). The earlier "15–16×10¹², mz=+0.96" statement was
-  a mid-relaxation snapshot and is superseded.
+  (full scan; no further windows); 0.4 ns snapshots read +0.96 while the
+  1.5 ns relaxed value is +0.981.
+* The θ=0.3 **no-heating** series was extended from 16 to 30×10¹²
+  (Jp = 17, 18, 20, 22, 24, 26, 28, 30×10¹², t_free = 1.5 ns, all uniform
+  −0.981; 17/18×10¹² also switch): t_cross falls monotonically from 40.0 ps
+  (17×10¹²) to 28.9 ps (30×10¹²), so the green curve in `phase_speed.png` /
+  `phase_map.png` now spans the same current range as the θ=0.2 series.
 * Figures: `docs/figures/phase_map.png`, `phase_speed.png`, `phase_traces.png`.
 
-### 0.2.1 Late-time verification and domain artefacts (2026-09-17)
+### 3. Late-time verification and domain artefacts (2026-09-17)
 
 Motivated by the non-monotonic window, the heated θ=0.2/0.3 series and every
 boundary point were re-run with `t_free=1500 ps` (temperature back to ~300 K; all
@@ -67,9 +66,9 @@ uniform states settle to |mz|≈0.981):
   reproduces the archived `table.txt` to a maximum deviation of 2.5×10⁻⁷ (GPU
   reduction rounding only); the window is deterministic, and halving `FixDt`
   (25 fs) changes nothing.
-* The original 0.4 ns snapshot understated |mz| near the boundaries (e.g. θ=0.2
-  heated 14×10¹² read −0.76 while the relaxed value is −0.981); the map now
-  prefers the `*_lr1500` runs wherever they exist.
+* The 0.4 ns snapshot understates |mz| near the boundaries (e.g. θ=0.2 heated
+  14×10¹² reads −0.76 vs −0.981 relaxed); the map uses the `*_lr1500` runs
+  wherever they exist.
 * **Domain artefacts**: at some near-threshold / extreme points the 64×64 film is
   **not** a single domain at the end of the run; the OVF shows stripe domains
   (mz spans ±0.99, |⟨m⟩|≈0.28–0.58, wall width √(A/Kz)≈5 nm ≈ cell size, i.e. the
@@ -80,210 +79,73 @@ uniform states settle to |mz|≈0.981):
 * **High-current scan** (θ=0.2, 21–30×10¹² in 1×10¹² steps, heating on and off):
   all points are uniform switches except the 27×10¹² domain artefact — **no
   second precessional window**. Tmax>Tc from ~19×10¹², so this range is outside
-  the calibrated SI heat model and is quoted as a trend only.
+  the calibrated heat model and is quoted as a trend only.
+* **Hot-branch re-run (2026-09-17)**: the θ=0.2 heated points 21–30×10¹² were
+  re-run from the archived scripts (outputs in `runs/_verify/`). Final states
+  (all −0.9807) and t_cross (≤0.1 ps) reproduce. Traces: 7/9 bit-identical
+  (≤2×10⁻⁷, GPU rounding), 24/25/26/30 differ by ~10⁻⁴, and 22×10¹² deviates
+  transiently by up to 0.16 during the ~400 ps recovery (T≈430 K, |⟨m⟩| small,
+  multidomain transient) but converges to the same state. While T≥800 K the
+  film is demagnetized (mumax3 prints `Note: Msat = 0`), and the first zero
+  crossing sits within a few ps of the time T drops back below Tc
+  (e.g. 30×10¹²: 269.6 ps vs 261.7 ps) → the rising t_cross beyond 20×10¹² is
+  the cooling time through Tc, not a switching speed. At 20×10¹² the crossing
+  (26.2 ps) happens just before T reaches 800 K (26.5 ps), so it is still a
+  genuine SOT crossing; the 20→21×10¹² jump marks the onset of the
+  demagnetization-dominated regime. `phase_speed.png` therefore cuts every
+  heated series at Tmax ≤ Tc (θ=0.2: 19×10¹², θ=0.3: 18×10¹²) and draws the
+  excluded points as grey crosses.
 
-### 0.3 Pulse-width window (θ=0.2, Jp=10×10¹², heating off)
+### 4. Pulse-width window (θ=0.2, Jp=10×10¹², heating off)
 
 No switching for 6/8/10/12 ps; **15 ps partial (−0.93), 20/30 ps full reversal** →
 the half-precession-period condition (~18–19 ps) appears exactly where the paper
-puts the energy minimum ("10–20 ps", SI Note 3.5).
+puts the energy minimum ("10–20 ps" in the paper).
 
-### 0.4 Mechanism decomposition (SI heating, θ=0.2)
+### 5. Mechanism decomposition (heating on, θ=0.2)
 
 | control | setting | result |
 |---|---|---|
 | Kz(T) frozen | `ScaleKz=0` (Ms(T) still on) | **no switching up to 14×10¹²** → Kz(T) collapse is the necessary channel |
 | Ms(T) frozen | `ScaleMs=0` (Kz(T) on) | 10×10¹² partial +0.45, 12×10¹² partial −0.46 → Kz collapse alone nearly switches |
-| θ≈0 (thermal-anisotropy torque only) | `ThetaDL=1e-4, EpsilonPrime=0` | switches at 12×10¹² (122.5 ps) and 14×10¹² (80.2 ps) → SI Fig. 5 behaviour (slower, hotter) |
+| θ≈0 (thermal-anisotropy torque only) | `ThetaDL=1e-4, EpsilonPrime=0` | switches at 12×10¹² (122.5 ps) and 14×10¹² (80.2 ps) → paper behaviour (slower, hotter) |
 | Hx=0 | `Hx_mT=0` | never switches (macrospin and full device, +1.0000) |
 | Langevin noise | `Noise=1` | Jp=9×10¹²: no-flip → partial (−0.32); Jp=10×10¹² −0.94; repeat runs are bit-identical (fixed seed) → no P<sub>sw</sub> statistics possible in-script |
 
 Figure: `docs/figures/mechanism_compare.png`.
 
-### 0.5 Full device (5×4 µm, 10 nm cells)
+### 6. Full device (5×4 µm, 10 nm cells)
 
 * Four quadrants at Jpk=1.2×10¹³ (Tmax=497 K): q1 −0.971, q2 +0.970, q3 +0.970,
   q4 −0.971 → `sign(mz_final) = −sign(Hx·I)` (paper Fig. 3), uniform single domains.
-* Device threshold with SI heating (θ=0.2): no switching at 8/9×10¹², switching from
+* Device threshold with heating (θ=0.2): no switching at 8/9×10¹², switching from
   10×10¹² — consistent with the macrospin threshold; no nucleation-induced reduction
   on this clean 10 nm grid.
 * Figures: `docs/figures/q_quadrants.png`.
 
-### 0.6 Fig. 4 dynamics (3.7 ps, Jpk=4×10¹², echo=0.3/ted=24 ps)
+### 7. Fig. 4 dynamics (3.7 ps, Jpk=4×10¹², echo=0.3/ted=24 ps)
 
 * Parallel group: dip −5.9% at ~29 ps; antiparallel: −1.9% at ~17 ps, no positive
   overshoot; Hx=0: pure demagnetization, no oscillation. Precession period ≈44 ps
   (paper: ~40 ps). Peak ΔT = +13.9 K (heat model predicts 13.8 K).
 * Figure: `docs/figures/fig4_full.png`.
 
-### 0.7 Energy
+### 8. Energy
 
-6×10¹² → 39.7 pJ (paper's budget scale); SI-model threshold 10×10¹² (θ=0.2) → **110 pJ**;
+6×10¹² → 39.7 pJ (paper's budget scale); model threshold 10×10¹² (θ=0.2) → **110 pJ**;
 θ=0.3 threshold 9×10¹² → 90 pJ; pure-SOT 20×10¹² → 441 pJ. The model therefore exceeds
 the paper's <50 pJ budget at its own switching threshold (the paper's budget
 corresponds to 6×10¹²). Figure: `docs/figures/energy_bars.png`.
 
-### 0.8 Caveats
+### 9. Caveats
 
-* Pulse waveform: SI never specifies it; we keep sech². Absolute Jc carries a
-  ~1.5× uncertainty relative to the SI's 9×10¹²/6×10¹².
-* θ<sub>DL</sub>: main-text fit 0.2, SI Figs. 3–5 use 0.3; both are provided (`ThetaDL`).
-* Jp ≳ 1.9×10¹³ drives the SI heat model through Tc (Ms→0): HAMR-like regime, which
+* Pulse waveform: the paper never specifies it; we keep sech². Absolute Jc carries a
+  ~1.5× uncertainty relative to the paper's 9×10¹²/6×10¹².
+* θ<sub>DL</sub>: main-text fit 0.2, strong-current simulations use 0.3; both are provided (`ThetaDL`).
+* Jp ≳ 1.9×10¹³ drives the paper's heat model through Tc (Ms→0): HAMR-like regime, which
   the paper excludes experimentally — treat such cases as model artefacts.
 * Langevin noise uses a fixed seed in mumax3 → deterministic repeats; P<sub>sw</sub>
-  statistics require kernel/driver work (ROADMAP P1).
-
-## 1. Model and timing calibration (legacy)
-
-* `macrospin_switch.mx3`: 64×64 cells, 5 nm cell size (320×320 nm), Co thickness 1 nm,
-  `Ms=1.3e6 A/m`, `Ha=1 T`, `alpha=0.15`, sech² pulse with FWHM=6 ps.
-* Measured pulse width: **5.85 ps**.
-* Relaxed equilibrium with `Hx=160 mT`: `mz ≈ 0.988 ≈ cos[atan(Hx/Ha)]`, as expected for
-  the tilted equilibrium state.
-* Energy accounting (`energy_check.py`, ρ=81 µΩ cm, V=5×4 µm²×15 nm): `∫J²dt` for the
-  6 ps pulse gives **39.7 pJ at Jp=6×10¹²**, consistent with the paper's 40 pJ.
-
-## 2. B1 — switching threshold (J<sub>ref</sub>=Jp, dT ∝ J²)
-
-| Jp (A/m²) | dT<sub>ref</sub> | Tmax | mz zero crossing | Final mz | Energy | Outcome |
-|---|---|---|---|---|---|---|
-| 6×10¹² | 300 K | 583 K | – | +0.988 | 39.7 pJ | no switching |
-| 8×10¹² | 450 K | 725 K | 58.6 ps | −0.988 | 70.6 pJ | switches |
-| 1.0×10¹³ | 300 K | 583 K | 88.8 ps | −0.11 | – | partial |
-| 1.2×10¹³ | 450 K | 725 K | 50.1 ps | −0.988 | 158.9 pJ | switches |
-| 2.0×10¹³ | 450 K | 725 K | **39.0 ps (fastest)** | −0.988 | 441 pJ | switches (paper's model: 16 ps) |
-
-At the paper's current ceiling (6×10¹²) the model does not switch with dT=300 K; the
-remaining 16 ps vs 39 ps gap and the energy gap trace back to the unpublished SI
-parameters.
-
-## 3. Four-quadrant polarity check (Fig. 3)
-
-`fig3_switching.mx3` defaults: `Jpk=1.2e13`, `dTpk=400 K`, `Tmax=680 K` (< Tc); mz crosses
-zero within ~50 ps; final |mz|≈0.96.
-
-| Case | Hx | I<sub>sign</sub> | Final mz |
-|---|---|---|---|
-| q1 | +160 mT | +1 | −0.956 |
-| q2 | −160 mT | +1 | +0.987 |
-| q3 | +160 mT | −1 | +0.987 |
-| q4 | −160 mT | −1 | −0.956 |
-
-i.e. `sign(mz_final) = −sign(Hx·I)`, matching the paper's Fig. 3. Final-state panels
-(`docs/figures/q_quadrants.png`, `plot_quadrants.py`) show uniform single domains in all four
-quadrants (no domain walls; only the open-boundary edge columns remain pinned). All batch
-runs start from the +Mz state; the paper's "independent of initial state" claim was not
-separately re-run here.
-
-## 4. C2 — Hx=0 symmetry control
-
-`runs/c2_Hx0_Jp8_dT450`, identical to `b1_Jp8_dT450` (`Jp=8e12`, `dT_ref=450`,
-`I_sign=+1`) except `Hx_mT=0`: transient minimum mz=0.80 at 40.2 ps, then recovery; final
-**+1.0000**, no zero crossing (`t_cross` empty, Tmax=725 K). Contrast with the 58.6 ps
-switching at `Hx=+160 mT` → `Hx≠0` is required to break the symmetry.
-
-## 5. B2 — θ≈0 control
-
-`Pol=1e-4`, `EpsilonPrime=0`, `Jp=8e12`:
-
-* dT=300 K: no switching.
-* dT=450/600/800 K: switching with zero crossings at **85.9/92.3/122.4 ps**
-  (Tmax = 725/867/1056 K).
-
-Thermal anisotropy torque alone can switch the magnet, but more slowly and with stronger
-heating; qualitatively consistent with the paper's SI Fig. 5.
-
-## 6. B3 — Ku(T) switch-off
-
-* `KuExp=0` (temperature-independent Ku): no switching even at Jp=1.4×10¹³.
-* `KuExp=3` (Ku ∝ Ms³): partial switching at 1×10¹³ (final −0.11), full switching at 1.2×10¹³.
-
-The thermal anisotropy torque is essential in this model; the threshold energy ratio is
-≥ 2, matching the paper's "2× lower energy" statement.
-
-## 7. C0 — Heating=0 control
-
-Same parameters as `b0_6e12` / `b0_8e12` / `b1_Jp10_dT300`, heating off
-(`runs/c0_noh_*`, `docs/figures/heating_on_off.png`):
-
-| Jp (A/m²) | T | Final mz | Peak transient dip |
-|---|---|---|---|
-| 6×10¹² | 300 K | +0.988 | −8.1% |
-| 8×10¹² | 300 K | +0.988 | −12.4% |
-| 10×10¹² | 300 K | +0.988 | −17.6% |
-
-All three fail to switch. The transient dip (~33 ps) is measured relative to the relaxed
-equilibrium mz=0.988 (the first table row at t=0 is the un-relaxed mz=1 state and must not
-be used as a baseline). Deterministic switching at 6–10×10¹² therefore relies entirely on
-the Joule-heating-induced thermal anisotropy torque.
-
-## 8. C1 — phase-boundary midpoints (J<sub>ref</sub>=Jp)
-
-| Jp (A/m²) | dT<sub>ref</sub> | Tmax | Outcome | Zero crossing | Energy |
-|---|---|---|---|---|---|
-| 9×10¹² | 300 K | 583 K | no switch (final +0.933) | – | – |
-| 8×10¹² | 375 K | 654 K | switches | 66.5 ps | – |
-| 7×10¹² | 450 K | 725 K | switches | 61.0 ps | 54.1 pJ |
-| 6×10¹² | 600 K | 867 K | switches | 80.5 ps | 39.7 pJ (Tmax > Tc) |
-
-Boundary localization: `Jc ∈ (9,10]e12` on the Tmax≈583 K line; `dTc ∈ (300,375] K` on the
-Jp=8×10¹² line. 7×10¹² switches at Tmax=725 K; 6×10¹² needs Tmax≳867 K (hotter and slower).
-Final figures: `docs/figures/phase_map.png`, `docs/figures/phase_traces.png`, `docs/figures/phase_speed.png`
-(`plot_phase.py`; the grey diamonds in the phase map are the C2 Hx=0 control points and are
-excluded from the boundary fit).
-
-Additional point: `b0_8e12` (`J_ref=6e12`, `dT_ref=300 K` → Tmax=804 K) switches at
-54.5 ps.
-
-## 9. Fig. 4 dynamics
-
-`runs/a_f4_*` (Hx ∈ {0,±160 mT} × I±, `echo=0.3`, `ted=24 ps`), combined figure
-`docs/figures/fig4_full.png` (`plot_fig4.py`, legend grouped into parallel / antiparallel / no Hx):
-
-* Precession period ≈ 37 ps (paper: ~40 ps for Ha≈1 T).
-* `Hx=0`: ±I curves coincide, no oscillation (simple dip + slow recovery).
-* Parallel group (Hx+,I+) and (Hx−,I−) coincide: dip −4.8% @15.8 ps followed by
-  out-of-phase precession.
-* Antiparallel group (Hx+,I−) and (Hx−,I+) coincide: **no positive overshoot** in the
-  plotted ΔMz/Ms (minimum −3.5% @31.8 ps); the raw mz rises from 0.987 to 0.999 but this is
-  masked by the drop in Ms(T). The +1.3% spike at t=0 in figures/tables is an un-relaxed
-  first-row (mz=1) artifact present in every Hx≠0 curve, not an antiparallel feature.
-* All curves recover to ≈ −0.25% after 400 ps.
-* The echo appears as a secondary peak in T(t) at ~29–31 ps (main pulse t0=5 ps, so
-  t0+ted ≈ 29 ps) and gives the magnetization a secondary kick.
-
-Early-reference re-run: `runs/dyn_Jp1e12_Ip` (`RunDynamics=1`, 3.7 ps FWHM, Jp=1×10¹²) gives
-Tmax≈308 K, mz<sub>final</sub>=+0.9879 (no switching), consistent with the early reference; the
-switching-type reference is `runs/b0_6e12`.
-
-## 10. Mechanism overview figure
-
-`docs/figures/mechanism_compare.png` (`plot_mechanism.py`) shows three panels side by side:
-(a) c0/b0 heating on/off, (b) b2 θ≈0, (c) b3 Ku(T) frozen. Solid/dashed lines are the
-control arms of each condition; thin dash-dotted lines of the same color show the
-corresponding T(t).
-
-## 11. Energy summary
-
-| Case | Energy | Note |
-|---|---|---|
-| 6×10¹², dT=300 K | 39.7 pJ | no switching |
-| 6×10¹², dT=600 K | 39.7 pJ | switches, Tmax=867 K > Tc (HAMR-like regime the paper excludes) |
-| 7×10¹², dT=450 K | 54.1 pJ | switches; lowest energy that switches without exceeding Tc |
-| 8×10¹², dT=450 K | 70.6 pJ | switches |
-| 1.2×10¹³, dT=450 K | 158.9 pJ | switches |
-| 2.0×10¹³, dT=450 K | 441 pJ | switches, fastest (39 ps) |
-
-The model can switch at the paper's current ceiling (6×10¹²) and fall back under the <50 pJ
-budget only with strong (above-Tc) heating; without exceeding Tc the lowest switching
-energy observed is 54.1 pJ at 7×10¹²/dT450.
-
-## 12. Historical correction
-
-The early adaptive-step "Jp=6×10¹² switching" was an artifact of the pulse being stretched
-to 27.6 ps (corresponding to 189 pJ). Those outputs were deleted and equivalent cases were
-re-run with the corrected scripts (switching `runs/b0_6e12`, dynamics `runs/dyn_Jp1e12_Ip`).
-See `notes/error.md` §1.11 for details.
+  statistics require kernel/driver work.
 
 ---
 
