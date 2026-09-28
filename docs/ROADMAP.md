@@ -46,9 +46,8 @@
 
 ## T. 可复现性与工具
 
-- [ ] **T1（P1, M）一键重建定稿图 `run_all.py`**
-  - 从 `runs/summary.csv` 依次调用 `plot_phase` / `plot_fig4` / `plot_mechanism` / `plot_quadrants` 等
-  - 验收：删掉 `runs/*.png` 后一条命令重建全部图，并拷入 `docs/figures/`（`runs/` 不入库）
+- [x] **T1（P1, M）一键重建定稿图**（2026-09-28 以 `plot_all.py` 完成；批量仿真用 `run_batch.py` + JSON 计划）
+  - `plot_all.py` 依次调用全部绘图脚本并拷入 `docs/figures/`（缺数据的脚本自动跳过）
 - [ ] **T2（P1, S）`run_case.py` 增强**
   - 跑前 `mumax3 -vet` 预检语法；stdout/stderr 落盘到 `runs/<tag>/`；加 `--dry-run`
   - 验收：失败的 case 保留日志现场；`--dry-run` 只写脚本不调用 mumax3
@@ -66,9 +65,10 @@
 ## P. 物理与验证
 
 - [ ] **P1（P0, L）概率翻转统计 `P_sw(Jp)`**
-  - 1024×800（5×4 µm 过流区）+ Voronoi 晶粒各向异性扰动 + 热噪声（sLLG），多随机种子统计
-  - 前置：mumax3 的 Langevin 噪声为固定种子（重复 run 逐位相同），需给 mumax3 打
-    补丁/外部驱动注入种子，或改用自写 sLLG
+  - ~~前置：固定种子~~ 已解决：`RandSeed()` 实测不影响噪声路径，改用 **FixDt 微抖动**
+    生成独立样本（无噪声对照证实抖动惰性，2026-09-28）
+  - [x] 宏自旋系综：窗口 9 个 Jp 点 × 8 样本 + 确定性对照（`noise_plan.json`，`plot_noise.py`）
+  - [ ] 1024×800（5×4 µm 过流区）+ Voronoi 晶粒各向异性扰动 + 热噪声（sLLG），多随机种子统计
   - 对标论文 >91% 翻转概率与成核图像
   - 验收：`P_sw(Jp)` 曲线 + 与论文对比图
 - [x] **P2（P1, M）热模型标定与敏感性**（2026-09-16 完成）
@@ -113,7 +113,7 @@
 - [ ] **D4（P2, S）硬件与实测耗时表**
   - RTX 5060 Laptop 8 GB / RTX 4070S 的宏自旋与全器件运行时间、显存占用
   - 验收：README 环境的表格化补充
-- [ ] **D5（P3, S）图件统一与英文标注**
+- [x] **D5（P3, S）图件统一与英文标注**（2026-09-28 以 `figstyle.py` 完成：统一字号≥9.5/配色/中文标注，LANG=en 可切）
   - 定稿图统一字号/配色；如需国际读者，出英文标注版本
   - 验收：`plot_*.py` 可切换 `LANG=en/zh`
 

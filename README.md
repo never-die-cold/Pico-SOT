@@ -31,6 +31,10 @@ channel of the paper's heat-diffusion model (6×10¹² / 6 ps → peak +50.4 K, 
 |---|---|
 | **Four quadrants**: uniform single domains, 5×4 µm device (`plot_quadrants.py`) | **Energy**: ∫J²dt·ρV (`plot_energy.py`) |
 
+| ![](docs/figures/anomaly_evidence.png) | ![](docs/figures/anomaly_ablation.png) |
+|---|---|
+| **Recapture window attributed**: damped precession around +x vs well recovery (`plot_anomaly.py`) | **Ablation matrix**: H<sub>x</sub>/G<sub>int</sub>/T<sub>c</sub> systematically move the window (`plot_anomaly_ablation.py`) |
+
 ## 1. Key findings (paper parameters)
 
 * **Pure SOT switches without Joule heating**: threshold 20×10¹² at θ<sub>DL</sub>=0.2
@@ -44,18 +48,26 @@ channel of the paper's heat-diffusion model (6×10¹² / 6 ps → peak +50.4 K, 
   only) → switches from 12×10¹², slower (paper behaviour).
 * **Pulse-width window** at 10×10¹² (heating off): no switching ≤12 ps, switching
   from 15 ps → half-precession-period condition reproduced.
-* **Precessional windows (with heating)**: θ<sub>DL</sub>=0.2 fails to switch for
-  **15–17×10¹²** and θ<sub>DL</sub>=0.3 for 14–17×10¹² (uniform recapture, |⟨m⟩|=1.000,
-  verified with 1.5 ns free relaxation); switching recovers at 18×10¹² with no
-  further windows up to 30×10¹².
+* **Precessional recapture window — attributed**: with heating, θ<sub>DL</sub>=0.2
+  fails to switch for **14.5–17×10¹²** (0.5×10¹² fine grid) and θ<sub>DL</sub>=0.3 for
+  15–17×10¹² (uniform recapture, verified with 1.5 ns relaxation). Mechanism: while
+  H<sub>k</sub>(T) is collapsed below H<sub>x</sub> the ±z wells vanish; the moment
+  performs a damped precession revolution around ≈+x and is captured by whichever
+  side it faces when the recovering well depth passes H<sub>x</sub> — a deterministic
+  race producing alternating switch/no-switch bands. H<sub>x</sub>/G<sub>int</sub>/T<sub>c</sub>
+  ablations move the bands exactly as this model predicts (criterion: last
+  zero-crossing at H<sub>k</sub>≈1.1·H<sub>x</sub>, n=42). See [`docs/anomaly.md`](docs/anomaly.md).
 * **Energy**: model threshold (10×10¹², θ=0.2) → 110 pJ, above the paper's <50 pJ
   budget scale (6×10¹²); absolute thresholds are ~1.5× above the paper's values, most
   likely because the paper never specifies the pulse waveform/reflections.
 * **Caveats**: near-threshold / very-high-current points can break the 64×64 film
-  into stripe domains (|⟨m⟩|<0.9, cell size ≈ domain-wall width); those are excluded
-  from the threshold map (grey crosses). Jp≳1.9×10¹³ drives the model through Tc
-  (HAMR-like, excluded by the paper's experiment); mumax3's Langevin noise has a
-  fixed seed → no P<sub>sw</sub> statistics.
+  into stripe domains (|⟨m⟩|<0.9, cell size ≈ domain-wall width); those carry no
+  single-domain verdict and are **not drawn at all** — the threshold polylines
+  simply connect the surviving points (the excluded Jp values are listed in
+  [`docs/RESULTS.md`](docs/RESULTS.md) §3). Jp≳1.9×10¹³ drives the model through Tc
+  (HAMR-like, excluded by the paper's experiment); grain-level disorder is not
+  modelled (macrospin P<sub>sw</sub> statistics are done via FixDt-jitter noise
+  ensembles — mumax3's noise RNG has a fixed seed and `RandSeed()` is inert).
 
 Full quantitative record: [`docs/RESULTS.md`](docs/RESULTS.md).
 
@@ -72,6 +84,8 @@ slides/
 ├─ assets/device_stack.png             # device sketch
 └─ PicoSOT_组会汇报.pptx                # group-meeting deck (build_ppt.py output)
 docs/
+├─ MODEL.md                            # self-contained model & data description (zh)
+├─ anomaly.md                          # recapture-window attribution report (zh)
 ├─ RESULTS.md                          # full experiment log
 ├─ paper_replica.md                       # paper ↔ mumax3 mapping + heat-model calibration (zh)
 └─ figures/                            # final figures embedded above
@@ -159,12 +173,14 @@ i.e. `sign(mz_final) = -sign(Hx·I)` (all batch runs start from +Mz; the paper's
 | θ=0.2, with heating | (9, 10]×10¹² | Tmax (411,438] K; switches from 10×10¹² (68.3 ps) |
 | θ=0.2, heating off | 20×10¹² (19×10¹² ⇒ multidomain, excluded) | **pure SOT switches** |
 | θ=0.3, with heating | (8, 9]×10¹² | |
-| θ=0.3, heating off | (12, 14]×10¹² (13×10¹² ⇒ multidomain, excluded) | |
+| θ=0.3, heating off | (12.5, 14]×10¹² (13/13.5×10¹² ⇒ multidomain) | |
 
-With heating, θ=0.2 does **not** switch at **15–17×10¹²** (0.98 → uniform recapture; the
-same window is 14–17×10¹² for θ=0.3, where 14×10¹² is a multidomain artefact);
-switching resumes at 18×10¹² and stays on up to 30×10¹² (scan, 1.5 ns relaxation:
-no further windows; 27×10¹² heated is a multidomain artefact). The window is a
+With heating, θ=0.2 does **not** switch at **14.5–17×10¹²** (0.98 → uniform recapture;
+the same window is 15–17×10¹² for θ=0.3, where 14/17.5×10¹² are multidomain
+artefacts and the curve stops at 20×10¹² because every higher point is
+multidomain); switching resumes at 18×10¹² and stays on up to 30×10¹² (scan,
+1.5 ns relaxation: no further windows; 17.5/19.5/27×10¹² heated are multidomain
+artefacts, not plotted). The window is a
 deterministic precessional-recapture effect (the 64×64 film stays a single uniform
 domain, |⟨m⟩|=1.000).
 
