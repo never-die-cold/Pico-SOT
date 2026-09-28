@@ -1,0 +1,515 @@
+[
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t20_Jp12p5",
+  "set": {
+   "Jp": "12.5e12",
+   "Heating": "1",
+   "ThetaDL": "0.2"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t20_Jp13p5",
+  "set": {
+   "Jp": "13.5e12",
+   "Heating": "1",
+   "ThetaDL": "0.2"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t20_Jp14p5",
+  "set": {
+   "Jp": "14.5e12",
+   "Heating": "1",
+   "ThetaDL": "0.2"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t20_Jp15p5",
+  "set": {
+   "Jp": "15.5e12",
+   "Heating": "1",
+   "ThetaDL": "0.2"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t20_Jp16p5",
+  "set": {
+   "Jp": "16.5e12",
+   "Heating": "1",
+   "ThetaDL": "0.2"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t20_Jp17p5",
+  "set": {
+   "Jp": "17.5e12",
+   "Heating": "1",
+   "ThetaDL": "0.2"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t20_Jp18p5",
+  "set": {
+   "Jp": "18.5e12",
+   "Heating": "1",
+   "ThetaDL": "0.2"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t20_Jp19p5",
+  "set": {
+   "Jp": "19.5e12",
+   "Heating": "1",
+   "ThetaDL": "0.2"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t20_Jp12p5",
+  "set": {
+   "Jp": "12.5e12",
+   "Heating": "0",
+   "ThetaDL": "0.2"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t20_Jp13p5",
+  "set": {
+   "Jp": "13.5e12",
+   "Heating": "0",
+   "ThetaDL": "0.2"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t20_Jp14p5",
+  "set": {
+   "Jp": "14.5e12",
+   "Heating": "0",
+   "ThetaDL": "0.2"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t20_Jp15p5",
+  "set": {
+   "Jp": "15.5e12",
+   "Heating": "0",
+   "ThetaDL": "0.2"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t20_Jp16p5",
+  "set": {
+   "Jp": "16.5e12",
+   "Heating": "0",
+   "ThetaDL": "0.2"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t20_Jp17p5",
+  "set": {
+   "Jp": "17.5e12",
+   "Heating": "0",
+   "ThetaDL": "0.2"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t20_Jp18p5",
+  "set": {
+   "Jp": "18.5e12",
+   "Heating": "0",
+   "ThetaDL": "0.2"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t20_Jp19p5",
+  "set": {
+   "Jp": "19.5e12",
+   "Heating": "0",
+   "ThetaDL": "0.2"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t30_Jp12p5",
+  "set": {
+   "Jp": "12.5e12",
+   "Heating": "1",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t30_Jp13p5",
+  "set": {
+   "Jp": "13.5e12",
+   "Heating": "1",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t30_Jp14p5",
+  "set": {
+   "Jp": "14.5e12",
+   "Heating": "1",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t30_Jp15p5",
+  "set": {
+   "Jp": "15.5e12",
+   "Heating": "1",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t30_Jp16p5",
+  "set": {
+   "Jp": "16.5e12",
+   "Heating": "1",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t30_Jp17p5",
+  "set": {
+   "Jp": "17.5e12",
+   "Heating": "1",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t30_Jp18p5",
+  "set": {
+   "Jp": "18.5e12",
+   "Heating": "1",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t30_Jp19",
+  "set": {
+   "Jp": "19e12",
+   "Heating": "1",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t30_Jp19p5",
+  "set": {
+   "Jp": "19.5e12",
+   "Heating": "1",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t30_Jp21",
+  "set": {
+   "Jp": "21e12",
+   "Heating": "1",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t30_Jp22",
+  "set": {
+   "Jp": "22e12",
+   "Heating": "1",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t30_Jp23",
+  "set": {
+   "Jp": "23e12",
+   "Heating": "1",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t30_Jp24",
+  "set": {
+   "Jp": "24e12",
+   "Heating": "1",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t30_Jp25",
+  "set": {
+   "Jp": "25e12",
+   "Heating": "1",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t30_Jp26",
+  "set": {
+   "Jp": "26e12",
+   "Heating": "1",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t30_Jp27",
+  "set": {
+   "Jp": "27e12",
+   "Heating": "1",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t30_Jp28",
+  "set": {
+   "Jp": "28e12",
+   "Heating": "1",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t30_Jp29",
+  "set": {
+   "Jp": "29e12",
+   "Heating": "1",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t30_Jp30",
+  "set": {
+   "Jp": "30e12",
+   "Heating": "1",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t30_Jp12p5",
+  "set": {
+   "Jp": "12.5e12",
+   "Heating": "0",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t30_Jp13p5",
+  "set": {
+   "Jp": "13.5e12",
+   "Heating": "0",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t30_Jp14p5",
+  "set": {
+   "Jp": "14.5e12",
+   "Heating": "0",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t30_Jp15p5",
+  "set": {
+   "Jp": "15.5e12",
+   "Heating": "0",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t30_Jp16p5",
+  "set": {
+   "Jp": "16.5e12",
+   "Heating": "0",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t30_Jp17",
+  "set": {
+   "Jp": "17e12",
+   "Heating": "0",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t30_Jp17p5",
+  "set": {
+   "Jp": "17.5e12",
+   "Heating": "0",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t30_Jp18",
+  "set": {
+   "Jp": "18e12",
+   "Heating": "0",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t30_Jp18p5",
+  "set": {
+   "Jp": "18.5e12",
+   "Heating": "0",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t30_Jp19",
+  "set": {
+   "Jp": "19e12",
+   "Heating": "0",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t30_Jp19p5",
+  "set": {
+   "Jp": "19.5e12",
+   "Heating": "0",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t30_Jp20",
+  "set": {
+   "Jp": "20e12",
+   "Heating": "0",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t30_Jp21",
+  "set": {
+   "Jp": "21e12",
+   "Heating": "0",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t30_Jp22",
+  "set": {
+   "Jp": "22e12",
+   "Heating": "0",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t30_Jp23",
+  "set": {
+   "Jp": "23e12",
+   "Heating": "0",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t30_Jp24",
+  "set": {
+   "Jp": "24e12",
+   "Heating": "0",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t30_Jp25",
+  "set": {
+   "Jp": "25e12",
+   "Heating": "0",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t30_Jp26",
+  "set": {
+   "Jp": "26e12",
+   "Heating": "0",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t30_Jp27",
+  "set": {
+   "Jp": "27e12",
+   "Heating": "0",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t30_Jp28",
+  "set": {
+   "Jp": "28e12",
+   "Heating": "0",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t30_Jp29",
+  "set": {
+   "Jp": "29e12",
+   "Heating": "0",
+   "ThetaDL": "0.3"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_noh_t30_Jp30",
+  "set": {
+   "Jp": "30e12",
+   "Heating": "0",
+   "ThetaDL": "0.3"
+  }
+ }
+]
