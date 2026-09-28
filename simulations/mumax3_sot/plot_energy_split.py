@@ -13,6 +13,8 @@ Bar colours:  white/blue = no switch, crimson = switches, orange hatched =
 switches but Tmax > Tc (HAMR-like, model outside its calibration), grey
 hatched = multidomain artefact (|average m| < 0.9, excluded).
 
+2026-09-28 restyled with figstyle (D5): readable fonts, Chinese labels.
+
 Usage:
     python plot_energy_split.py [--runs runs] [--out runs/energy_bars_split.png]
 """
@@ -29,8 +31,7 @@ from matplotlib.patches import Patch
 from energy_check import RHO, VSTACK, find_table, load_j
 from plot_phase import load_points
 
-plt.rcParams["font.sans-serif"] = ["Microsoft YaHei", "SimHei", "DejaVu Sans"]
-plt.rcParams["axes.unicode_minus"] = False
+import figstyle as fs
 
 JP_MIN, JP_MAX = 6, 20
 
@@ -44,13 +45,14 @@ def classify(p):
 
 
 def fig_split(pts, runs, out):
+    fs.apply()
     face = {"no": "white", "switch": "crimson", "over_tc": "darkorange",
             "excluded": "0.75"}
     edge = {"no": "tab:blue", "switch": "crimson", "over_tc": "darkorange",
             "excluded": "0.35"}
     hatch = {"no": "", "switch": "", "over_tc": "//", "excluded": "xx"}
 
-    fig, ax = plt.subplots(1, 2, figsize=(11.2, 4.5), sharey=True,
+    fig, ax = plt.subplots(1, 2, figsize=(12.8, 5.2), sharey=True,
                            constrained_layout=True)
     emax = 0.0
 
@@ -67,48 +69,44 @@ def fig_split(pts, runs, out):
             jps.append(p["Jp"] / 1e12)
             energies.append(e * 1e12)
             kinds.append(classify(p))
-            print("heat=%d %-24s Jp=%4.0fe12  E=%7.2f pJ  mz=%+.3f  |m|=%s  %s"
-                  % (heat, p["tag"], p["Jp"] / 1e12, e * 1e12, p["mz"],
-                     "%.3f" % p["uni"], kinds[-1]))
         x = np.array(jps) - JP_MIN
         for xi, e, k in zip(x, energies, kinds):
             axx.bar(xi, e, width=0.66, color=face[k], edgecolor=edge[k],
                     hatch=hatch[k], linewidth=0.9, zorder=3)
             axx.text(xi, e + 7, "%.0f" % e, ha="center", va="bottom",
-                     fontsize=6, rotation=90, zorder=4)
+                     fontsize=8.5, rotation=90, zorder=4)
 
-        axx.axhline(50, color="k", ls="--", lw=1.0, zorder=2)
-        axx.text(JP_MAX - JP_MIN + 0.42, 54, "paper budget < 50 pJ",
-                 ha="right", fontsize=7.5)
+        axx.axhline(50, color="k", ls="--", lw=1.1, zorder=2)
+        axx.text(JP_MAX - JP_MIN + 0.42, 54, "论文预算 < 50 pJ",
+                 ha="right", fontsize=9.5)
         axx.set_xticks(np.arange(JP_MAX - JP_MIN + 1))
-        axx.set_xticklabels([str(v) for v in range(JP_MIN, JP_MAX + 1)],
-                            fontsize=7.5)
-        axx.set_xlabel(r"$J_p$ ($10^{12}$ A/m$^2$)", fontsize=10)
+        axx.set_xticklabels([str(v) for v in range(JP_MIN, JP_MAX + 1)])
+        axx.set_xlabel(r"$J_p$（10$^{12}$ A/m$^2$）")
         axx.grid(axis="y", alpha=0.25, lw=0.5, zorder=0)
-        axx.set_title("heating on ($M_s(T)$, $K_z(T)$)" if heat
-                      else "heating off (T = 300 K)", fontsize=10.5)
-        if heat:  # 15-17e12 precessional recapture window
-            axx.axvspan(15 - 0.5 - JP_MIN, 17 + 0.5 - JP_MIN, color="0.92",
+        axx.set_title("加热开（$M_s(T)$、$K_z(T)$）" if heat
+                      else "加热关（T = 300 K）")
+        if heat:  # 14.5-17e12 precessional recapture window
+            axx.axvspan(14.5 - 0.25 - JP_MIN, 17 + 0.25 - JP_MIN, color="0.92",
                         zorder=1)
-            axx.text(16 - JP_MIN, 465, "recapture\nwindow", ha="center",
-                     va="center", fontsize=7, color="0.35", zorder=4)
+            axx.text(15.75 - JP_MIN, 465, "回翻窗口\n14.5–17", ha="center",
+                     va="center", fontsize=9.5, color="0.30", zorder=4)
         if panel == 0:
-            axx.set_ylabel("Joule energy per 6 ps pulse (pJ)", fontsize=10)
+            axx.set_ylabel("每个 6 ps 脉冲的焦耳能量 (pJ)")
         emax = max(emax, max(energies))
 
     handles = [
-        Patch(facecolor="white", edgecolor="tab:blue", label="no switch"),
-        Patch(facecolor="crimson", edgecolor="crimson", label="switch"),
+        Patch(facecolor="white", edgecolor="tab:blue", label="不翻"),
+        Patch(facecolor="crimson", edgecolor="crimson", label="翻转"),
         Patch(facecolor="darkorange", edgecolor="darkorange", hatch="//",
-              label="switch, $T_{max}>T_c$"),
+              label="翻转但 $T_{max}>T_c$"),
         Patch(facecolor="0.75", edgecolor="0.35", hatch="xx",
-              label="multidomain (excluded)"),
+              label="多畴伪影（剔除）"),
     ]
     fig.legend(handles=handles, loc="outside lower center", ncol=4,
-               fontsize=8.5, frameon=False)
-    fig.suptitle("Joule energy  E = $\\int J^2 dt\\cdot\\rho V$"
-                 "   ($\\rho$=81 $\\mu\\Omega$cm, V=5$\\times$4$\\times$0.015 $\\mu$m$^3$,"
-                 "  $\\theta_{DL}$=0.2, 6 ps sech$^2$)", fontsize=11)
+               fontsize=9.5, frameon=False)
+    fig.suptitle("焦耳能量 E = $\\int J^2 dt\\cdot\\rho V$"
+                 "（$\\rho$=81 $\\mu\\Omega$cm，V=5$\\times$4$\\times$0.015 $\\mu$m$^3$，"
+                 "$\\theta_{DL}$=0.2，6 ps sech$^2$）")
     ax[0].set_ylim(0, emax * 1.13)
     fig.savefig(out, dpi=200)
     print("saved:", out)

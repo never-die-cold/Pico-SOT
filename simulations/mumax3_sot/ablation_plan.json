@@ -1,0 +1,820 @@
+[
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "si_h_t20_Jp17",
+  "set": {
+   "Jp": "17e12",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx000_Jp12",
+  "set": {
+   "Jp": "12e12",
+   "Hx_mT": "0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx000_Jp13",
+  "set": {
+   "Jp": "13e12",
+   "Hx_mT": "0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx000_Jp14",
+  "set": {
+   "Jp": "14e12",
+   "Hx_mT": "0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx000_Jp15",
+  "set": {
+   "Jp": "15e12",
+   "Hx_mT": "0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx000_Jp16",
+  "set": {
+   "Jp": "16e12",
+   "Hx_mT": "0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx000_Jp17",
+  "set": {
+   "Jp": "17e12",
+   "Hx_mT": "0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx000_Jp18",
+  "set": {
+   "Jp": "18e12",
+   "Hx_mT": "0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx000_Jp19",
+  "set": {
+   "Jp": "19e12",
+   "Hx_mT": "0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx000_Jp20",
+  "set": {
+   "Jp": "20e12",
+   "Hx_mT": "0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx040_Jp12",
+  "set": {
+   "Jp": "12e12",
+   "Hx_mT": "40",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx040_Jp13",
+  "set": {
+   "Jp": "13e12",
+   "Hx_mT": "40",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx040_Jp14",
+  "set": {
+   "Jp": "14e12",
+   "Hx_mT": "40",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx040_Jp15",
+  "set": {
+   "Jp": "15e12",
+   "Hx_mT": "40",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx040_Jp16",
+  "set": {
+   "Jp": "16e12",
+   "Hx_mT": "40",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx040_Jp17",
+  "set": {
+   "Jp": "17e12",
+   "Hx_mT": "40",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx040_Jp18",
+  "set": {
+   "Jp": "18e12",
+   "Hx_mT": "40",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx040_Jp19",
+  "set": {
+   "Jp": "19e12",
+   "Hx_mT": "40",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx040_Jp20",
+  "set": {
+   "Jp": "20e12",
+   "Hx_mT": "40",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx080_Jp12",
+  "set": {
+   "Jp": "12e12",
+   "Hx_mT": "80",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx080_Jp13",
+  "set": {
+   "Jp": "13e12",
+   "Hx_mT": "80",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx080_Jp14",
+  "set": {
+   "Jp": "14e12",
+   "Hx_mT": "80",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx080_Jp15",
+  "set": {
+   "Jp": "15e12",
+   "Hx_mT": "80",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx080_Jp16",
+  "set": {
+   "Jp": "16e12",
+   "Hx_mT": "80",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx080_Jp17",
+  "set": {
+   "Jp": "17e12",
+   "Hx_mT": "80",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx080_Jp18",
+  "set": {
+   "Jp": "18e12",
+   "Hx_mT": "80",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx080_Jp19",
+  "set": {
+   "Jp": "19e12",
+   "Hx_mT": "80",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx080_Jp20",
+  "set": {
+   "Jp": "20e12",
+   "Hx_mT": "80",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx240_Jp12",
+  "set": {
+   "Jp": "12e12",
+   "Hx_mT": "240",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx240_Jp13",
+  "set": {
+   "Jp": "13e12",
+   "Hx_mT": "240",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx240_Jp14",
+  "set": {
+   "Jp": "14e12",
+   "Hx_mT": "240",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx240_Jp15",
+  "set": {
+   "Jp": "15e12",
+   "Hx_mT": "240",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx240_Jp16",
+  "set": {
+   "Jp": "16e12",
+   "Hx_mT": "240",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx240_Jp17",
+  "set": {
+   "Jp": "17e12",
+   "Hx_mT": "240",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx240_Jp18",
+  "set": {
+   "Jp": "18e12",
+   "Hx_mT": "240",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx240_Jp19",
+  "set": {
+   "Jp": "19e12",
+   "Hx_mT": "240",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx240_Jp20",
+  "set": {
+   "Jp": "20e12",
+   "Hx_mT": "240",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx320_Jp12",
+  "set": {
+   "Jp": "12e12",
+   "Hx_mT": "320",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx320_Jp13",
+  "set": {
+   "Jp": "13e12",
+   "Hx_mT": "320",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx320_Jp14",
+  "set": {
+   "Jp": "14e12",
+   "Hx_mT": "320",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx320_Jp15",
+  "set": {
+   "Jp": "15e12",
+   "Hx_mT": "320",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx320_Jp16",
+  "set": {
+   "Jp": "16e12",
+   "Hx_mT": "320",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx320_Jp17",
+  "set": {
+   "Jp": "17e12",
+   "Hx_mT": "320",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx320_Jp18",
+  "set": {
+   "Jp": "18e12",
+   "Hx_mT": "320",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx320_Jp19",
+  "set": {
+   "Jp": "19e12",
+   "Hx_mT": "320",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_hx320_Jp20",
+  "set": {
+   "Jp": "20e12",
+   "Hx_mT": "320",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_G085_Jp12",
+  "set": {
+   "Jp": "12e12",
+   "G_int": "85e6",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_G085_Jp13",
+  "set": {
+   "Jp": "13e12",
+   "G_int": "85e6",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_G085_Jp14",
+  "set": {
+   "Jp": "14e12",
+   "G_int": "85e6",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_G085_Jp15",
+  "set": {
+   "Jp": "15e12",
+   "G_int": "85e6",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_G085_Jp16",
+  "set": {
+   "Jp": "16e12",
+   "G_int": "85e6",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_G085_Jp17",
+  "set": {
+   "Jp": "17e12",
+   "G_int": "85e6",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_G085_Jp18",
+  "set": {
+   "Jp": "18e12",
+   "G_int": "85e6",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_G085_Jp19",
+  "set": {
+   "Jp": "19e12",
+   "G_int": "85e6",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_G085_Jp20",
+  "set": {
+   "Jp": "20e12",
+   "G_int": "85e6",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_G340_Jp12",
+  "set": {
+   "Jp": "12e12",
+   "G_int": "340e6",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_G340_Jp13",
+  "set": {
+   "Jp": "13e12",
+   "G_int": "340e6",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_G340_Jp14",
+  "set": {
+   "Jp": "14e12",
+   "G_int": "340e6",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_G340_Jp15",
+  "set": {
+   "Jp": "15e12",
+   "G_int": "340e6",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_G340_Jp16",
+  "set": {
+   "Jp": "16e12",
+   "G_int": "340e6",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_G340_Jp17",
+  "set": {
+   "Jp": "17e12",
+   "G_int": "340e6",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_G340_Jp18",
+  "set": {
+   "Jp": "18e12",
+   "G_int": "340e6",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_G340_Jp19",
+  "set": {
+   "Jp": "19e12",
+   "G_int": "340e6",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_G340_Jp20",
+  "set": {
+   "Jp": "20e12",
+   "G_int": "340e6",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc700_Jp12",
+  "set": {
+   "Jp": "12e12",
+   "Tc_K": "700.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc700_Jp13",
+  "set": {
+   "Jp": "13e12",
+   "Tc_K": "700.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc700_Jp14",
+  "set": {
+   "Jp": "14e12",
+   "Tc_K": "700.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc700_Jp15",
+  "set": {
+   "Jp": "15e12",
+   "Tc_K": "700.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc700_Jp16",
+  "set": {
+   "Jp": "16e12",
+   "Tc_K": "700.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc700_Jp17",
+  "set": {
+   "Jp": "17e12",
+   "Tc_K": "700.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc700_Jp18",
+  "set": {
+   "Jp": "18e12",
+   "Tc_K": "700.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc700_Jp19",
+  "set": {
+   "Jp": "19e12",
+   "Tc_K": "700.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc700_Jp20",
+  "set": {
+   "Jp": "20e12",
+   "Tc_K": "700.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc900_Jp12",
+  "set": {
+   "Jp": "12e12",
+   "Tc_K": "900.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc900_Jp13",
+  "set": {
+   "Jp": "13e12",
+   "Tc_K": "900.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc900_Jp14",
+  "set": {
+   "Jp": "14e12",
+   "Tc_K": "900.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc900_Jp15",
+  "set": {
+   "Jp": "15e12",
+   "Tc_K": "900.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc900_Jp16",
+  "set": {
+   "Jp": "16e12",
+   "Tc_K": "900.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc900_Jp17",
+  "set": {
+   "Jp": "17e12",
+   "Tc_K": "900.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc900_Jp18",
+  "set": {
+   "Jp": "18e12",
+   "Tc_K": "900.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc900_Jp19",
+  "set": {
+   "Jp": "19e12",
+   "Tc_K": "900.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc900_Jp20",
+  "set": {
+   "Jp": "20e12",
+   "Tc_K": "900.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc1000_Jp12",
+  "set": {
+   "Jp": "12e12",
+   "Tc_K": "1000.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc1000_Jp13",
+  "set": {
+   "Jp": "13e12",
+   "Tc_K": "1000.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc1000_Jp14",
+  "set": {
+   "Jp": "14e12",
+   "Tc_K": "1000.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc1000_Jp15",
+  "set": {
+   "Jp": "15e12",
+   "Tc_K": "1000.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc1000_Jp16",
+  "set": {
+   "Jp": "16e12",
+   "Tc_K": "1000.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc1000_Jp17",
+  "set": {
+   "Jp": "17e12",
+   "Tc_K": "1000.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc1000_Jp18",
+  "set": {
+   "Jp": "18e12",
+   "Tc_K": "1000.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc1000_Jp19",
+  "set": {
+   "Jp": "19e12",
+   "Tc_K": "1000.0",
+   "Heating": "1"
+  }
+ },
+ {
+  "template": "macrospin_switch.mx3",
+  "tag": "ab_Tc1000_Jp20",
+  "set": {
+   "Jp": "20e12",
+   "Tc_K": "1000.0",
+   "Heating": "1"
+  }
+ }
+]

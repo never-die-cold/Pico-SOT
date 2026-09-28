@@ -35,9 +35,9 @@ the complete macrospin model. All three .mx3 templates follow it.
 | series | threshold Jc (mz<sub>final</sub> < −0.5) | Tmax at threshold |
 |---|---|---|
 | θ<sub>DL</sub>=0.2, with heating | (9, 10]×10¹² (switches from 10×10¹², t<sub>cross</sub> 68.3 ps) | (411,438] K |
-| θ<sub>DL</sub>=0.2, heating off | 20×10¹² (19×10¹² → multidomain, excluded) | 300 K |
+| θ<sub>DL</sub>=0.2, heating off | (18, 19.5]×10¹² (18.5/19×10¹² → multidomain) | 300 K |
 | θ<sub>DL</sub>=0.3, with heating | (8, 9]×10¹² | (388,411] K |
-| θ<sub>DL</sub>=0.3, heating off | (12, 14]×10¹² (13×10¹² → multidomain, excluded) | 300 K |
+| θ<sub>DL</sub>=0.3, heating off | (12.5, 14]×10¹² (13/13.5×10¹² → multidomain) | 300 K |
 
 * **Pure SOT does switch without Joule heating** — at ~2× the heated threshold
   (θ=0.2: 20 vs 10×10¹², energy ratio 4×; θ=0.3: ~13.5 vs ~8.5×10¹², energy ratio ~2.3×).
@@ -45,7 +45,7 @@ the complete macrospin model. All three .mx3 templates follow it.
   energy ratio ~2×) **in ratio**; the absolute thresholds are ~1.5× higher here,
   most plausibly from the unknown pulse waveform/reflection sequence in the paper.
 * Non-monotonic precessional windows (uniform single domain, |⟨m⟩|=1.000): with
-  heating, θ=0.2 does **not** switch at **15–17×10¹²** and θ=0.3 at **14–17×10¹²**
+  heating, θ=0.2 does **not** switch at **14.5–17×10¹²** and θ=0.3 at **15–17×10¹²**
   (+0.98 recapture); switching recovers at **18×10¹²** and persists to 30×10¹²
   (full scan; no further windows); 0.4 ns snapshots read +0.96 while the
   1.5 ns relaxed value is +0.981.
@@ -73,9 +73,13 @@ uniform states settle to |mz|≈0.981):
   **not** a single domain at the end of the run; the OVF shows stripe domains
   (mz spans ±0.99, |⟨m⟩|≈0.28–0.58, wall width √(A/Kz)≈5 nm ≈ cell size, i.e. the
   pseudo-macrospin is at its resolution limit). Such points are invalid as
-  macrospin outcomes and are excluded from the map lines (grey crosses):
-  θ=0.2 heated 27×10¹², θ=0.2 no-heat 19×10¹², θ=0.3 heated 14×10¹²,
-  θ=0.3 no-heat 13×10¹².
+  macrospin outcomes and are **not drawn at all** (the old grey crosses were
+  removed 2026-09-28: they were easily mistaken for data and did not say which
+  series they belonged to). The polylines simply connect the surviving points
+  with straight lines. Masked Jp (×10¹², with the `*_lr1500` re-runs preferred):
+  θ=0.2 heated 17.5, 19.5, 27; θ=0.2 no-heat 18.5, 19; θ=0.3 heated 14, 17.5,
+  19.5 and 21–30 (every point above 20 is multidomain, inside the Tmax>Tc
+  regime); θ=0.3 no-heat 13, 13.5.
 * **High-current scan** (θ=0.2, 21–30×10¹² in 1×10¹² steps, heating on and off):
   all points are uniform switches except the 27×10¹² domain artefact — **no
   second precessional window**. Tmax>Tc from ~19×10¹², so this range is outside
@@ -93,8 +97,9 @@ uniform states settle to |mz|≈0.981):
   (26.2 ps) happens just before T reaches 800 K (26.5 ps), so it is still a
   genuine SOT crossing; the 20→21×10¹² jump marks the onset of the
   demagnetization-dominated regime. `phase_speed.png` therefore cuts every
-  heated series at Tmax ≤ Tc (θ=0.2: 19×10¹², θ=0.3: 18×10¹²) and draws the
-  excluded points as grey crosses.
+  heated series at Tmax ≤ Tc (θ=0.2: 19×10¹², θ=0.3: 18×10¹²) and marks the
+  over-Tc points with × (labelled in the legend); multidomain points are not
+  drawn in any panel.
 
 ### 4. Pulse-width window (θ=0.2, Jp=10×10¹², heating off)
 
@@ -144,8 +149,56 @@ corresponds to 6×10¹²). Figure: `docs/figures/energy_bars.png`.
 * θ<sub>DL</sub>: main-text fit 0.2, strong-current simulations use 0.3; both are provided (`ThetaDL`).
 * Jp ≳ 1.9×10¹³ drives the paper's heat model through Tc (Ms→0): HAMR-like regime, which
   the paper excludes experimentally — treat such cases as model artefacts.
-* Langevin noise uses a fixed seed in mumax3 → deterministic repeats; P<sub>sw</sub>
-  statistics require kernel/driver work.
+* Langevin noise uses a fixed seed in mumax3 (`RandSeed()` compiles but does not
+  affect the noise path — verified 2026-09-28) → deterministic repeats;
+  P<sub>sw</sub> statistics are therefore run as ensembles with micro-jittered
+  `FixDt` (independent noise realisations; deterministic controls confirm the
+  jitter itself is inert) — see §11.
+
+### 10. Recapture-window attribution (2026-09-28)
+
+The non-monotonic window (heated θ=0.2, no switch at 14.5–17.5×10¹² on the
+0.5×10¹² grid) is **not** a numerical artefact. Full report: `docs/anomaly.md`;
+figures `anomaly_evidence.png`, `anomaly_ablation.png`.
+
+* **Trajectories**: at Jp=15 the moment crosses zero at 38 ps, reaches mz=−0.86
+  at 92 ps (while H_k(T)≈0.19 T still ≲ Hx), then performs one damped
+  precession revolution around the ≈+x field and is recaptured by the
+  recovering anisotropy well at +z. Jp=18 follows the same orbit but is
+  captured at −z. The final polarity is decided by the orbit phase at the
+  moment the well recovers.
+* **Ablations** (90 runs, `ablation_plan.json`): the no-switch bands move
+  systematically under all three knobs, in the direction the race model
+  predicts — Hx ∈ {40…320} mT: window onset follows T*(Hx) (the temperature
+  where H_k(T)=Hx) and bands multiply at large Hx (three bands at 320 mT);
+  G_int ∈ {85, 170, 340} MW/m²K: faster cooling shrinks/shifts the window;
+  Tc ∈ {700…1000} K: weaker collapse pushes the window to higher Jp.
+* **Quantitative criterion**: the last mz zero-crossing of every Hx-ablation
+  case occurs when H_k(T)≈(1.1±0.5)·Hx (n=42) — capture commits exactly when
+  the recovering well depth passes the bias field.
+* **Controls** (existing runs): freezing Kz(T) prevents switching entirely;
+  freezing Ms(T) leaves marginal states; Hx=0 never switches; the no-heating
+  series shows no window at all.
+
+### 11. Data expansion: fine sweep + noise ensemble (2026-09-28)
+
+* **Fine grid** (`sweep_plan.json`, 57 runs): all four series
+  (θ=0.2/0.3 × heating on/off) densified to 0.5×10¹² steps inside
+  Jp=12–20×10¹² and extended to 30×10¹²; window edges resolve to
+  **14.5–17×10¹²**; the fine-grid boundary points 17.5, 19.5 (heated) and
+  18.5–19, 13–13.5 (no-heat) resolve to multidomain artefacts rather than
+  marginal outcomes — 17.5 settles at +0.08 and 19.5 at +0.07 with |<m>| < 0.35
+  after 1.5 ns relaxation, so they carry no single-domain verdict and are
+  masked (§3).
+* **Noise ensemble** (`noise_plan.json`, 74 runs): P_sw(Jp) around the window
+  from 8 independent Langevin realisations per point (FixDt micro-jitter),
+  plus two deterministic dt-jitter controls at Jp=15 (outcome unchanged).
+  Result: the recapture window is **fully noise-robust** — P_sw = 0/8 for every
+  Jp in 14–17×10¹² and 8/8 at 17.5 and 18 (sharp stochastic threshold between
+  17 and 17.5; the deterministic marginal point 17.5 becomes a certain switcher
+  under noise). The only deterministic/noise disagreement is Jp=14 (threshold
+  edge, deterministic switch required 1.5 ns relaxation; 0/8 under noise).
+  Statistics: `noise_stats.png` / `plot_noise.py`.
 
 ---
 

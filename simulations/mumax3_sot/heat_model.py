@@ -154,12 +154,12 @@ def main():
         ax[0].plot(tt, Tp, lw=1.2, label=r"$J_p$=%.0f$\times10^{12}$ A/m$^2$" % (jp / 1e12))
     ax[0].axhline(TC, color="gray", ls=":", lw=0.8)
     ax[0].text(0.02, 0.03, r"$T_c=800$ K", transform=ax[0].transAxes,
-               fontsize=8, color="gray")
+               fontsize=9.5, color="gray")
     ax[0].set_xlim(0, 200)
     ax[0].set_xlabel("time (ps)")
     ax[0].set_ylabel(r"$T_{Co}$ (K)")
     ax[0].set_title("heat-diffusion model (1D FD, paper)")
-    ax[0].legend(fontsize=7)
+    ax[0].legend(fontsize=9.5)
     ax[0].grid(alpha=0.25, lw=0.5)
 
     ax[1].plot(tt, T_AMB + T_co * (6e12) ** 2, "k-", lw=1.4,
@@ -170,7 +170,7 @@ def main():
     ax[1].set_xlabel("time (ps)")
     ax[1].set_ylabel(r"$T_{Co}$ (K)")
     ax[1].set_title(r"$J_p$ = 6$\times10^{12}$ A/m$^2$, 6 ps sech$^2$")
-    ax[1].legend(fontsize=7)
+    ax[1].legend(fontsize=9.5)
     ax[1].grid(alpha=0.25, lw=0.5)
     out = os.path.join(OUTDIR, "heat_model.png")
     fig.savefig(out, dpi=200)
