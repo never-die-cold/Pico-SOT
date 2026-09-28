@@ -24,6 +24,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+import figstyle as fs
+
 plt.rcParams["font.sans-serif"] = ["Microsoft YaHei", "SimHei", "DejaVu Sans"]
 plt.rcParams["axes.unicode_minus"] = False
 
@@ -88,12 +90,13 @@ def main():
     ax[0].set_xlabel("delay (ps)")
     ax[0].set_ylabel(r"$\Delta M_z\,/\,M_s$")
     ax[0].set_xlim(0, 425)
-    ax[0].legend(fontsize=8, loc="lower right", title="实线: Hx>0, 虚线: Hx<0",
-                 title_fontsize=7.5)
+    ax[0].legend(fontsize=9.5, loc="lower right", title="实线: Hx>0, 虚线: Hx<0",
+                 title_fontsize=9.5)
 
     # right panel: heating and current pulse (identical for all six runs)
     c = load_table(os.path.join(args.runs, "si_a_f4_Hx0_Ip", "out", "table.txt"))
-    ax[1].plot(t_ref, c["T"] - 300.0, color="crimson", lw=1.4, label=r"$\Delta T$ (K)")
+    tT, T = fs.destair(t_ref, c["T"])   # T is held over each 0.25 ps table step
+    ax[1].plot(tT, T - 300.0, color="crimson", lw=1.4, label=r"$\Delta T$ (K)")
     ax[1].set_xlabel("delay (ps)")
     ax[1].set_ylabel(r"$\Delta T$ (K)", color="crimson")
     ax[1].tick_params(axis="y", colors="crimson")
@@ -107,9 +110,9 @@ def main():
     axt.set_ylim(-0.05, 1.45)
     h1, l1 = ax[1].get_legend_handles_labels()
     h2, l2 = axt.get_legend_handles_labels()
-    ax[1].legend(h1 + h2, l1 + l2, fontsize=8, loc="upper right")
+    ax[1].legend(h1 + h2, l1 + l2, fontsize=9.5, loc="upper right")
     ax[1].annotate("echo at 29 ps (t0+ted)", xy=(29, 14), xytext=(75, 11),
-                   fontsize=8, color="0.35",
+                   fontsize=9.5, color="0.35",
                    arrowprops=dict(arrowstyle="->", color="0.35", lw=0.8))
 
     fig.savefig(args.out, dpi=200)
